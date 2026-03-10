@@ -2,7 +2,9 @@ package org.example.sbmdb.entity;
 
 import jakarta.persistence.*;
 
+
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,16 +19,15 @@ public class Movie {
     private String title;
 
     private String director;
-
     private String description;
-
     private Long runningTime;
-
-    private LocalDate releaseDate;
-
+    private LocalDate releaseYear;
     private Long rating;
 
-    private List<Review> reviews;
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
+    protected Movie() {}
 
     public Long getId() {
         return id;
@@ -36,8 +37,8 @@ public class Movie {
         return rating;
     }
 
-    public LocalDate getReleaseDate() {
-        return releaseDate;
+    public LocalDate getReleaseYear() {
+        return releaseYear;
     }
 
     public Long getRunningTime() {
@@ -59,4 +60,5 @@ public class Movie {
     public void setRating(Long rating) {
         this.rating = rating;
     }
+
 }

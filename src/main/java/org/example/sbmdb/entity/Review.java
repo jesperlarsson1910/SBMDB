@@ -11,13 +11,16 @@ public class Review {
     @Column(nullable = false)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
+
     private Long reviewRating;
-
     private String reviewAuthor;
-
     private String reviewText;
-
     private LocalDate reviewDate;
+
+    protected Review() {}
 
     public Long getId() {
         return id;
@@ -54,4 +57,5 @@ public class Review {
     public void setReviewDate(LocalDate reviewDate) {
         this.reviewDate = reviewDate;
     }
+
 }
