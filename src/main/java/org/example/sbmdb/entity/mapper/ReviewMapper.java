@@ -5,7 +5,6 @@ import org.example.sbmdb.entity.DTO.ReviewDTO;
 import org.example.sbmdb.entity.DTO.UpdateReviewDTO;
 import org.example.sbmdb.entity.Review;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewMapper {
