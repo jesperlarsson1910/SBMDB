@@ -18,7 +18,7 @@ public class Movie {
     @Column(nullable = false)
     private String title;
 
-    private String director;
+    private List<String> directors;
     private String description;
     private Long runningTime;
     private LocalDate releaseYear;
@@ -29,36 +29,64 @@ public class Movie {
 
     protected Movie() {}
 
+    public Movie(String title, List<String> directors, String description, Long runningTime, LocalDate releaseYear) {
+        this.title = title;
+        this.directors = directors;
+        this.description = description;
+        this.runningTime = runningTime;
+        this.releaseYear = releaseYear;
+    }
+
     public Long getId() {
         return id;
-    }
-
-    public Long getRating() {
-        return rating;
-    }
-
-    public LocalDate getReleaseYear() {
-        return releaseYear;
-    }
-
-    public Long getRunningTime() {
-        return runningTime;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getDirector() {
-        return director;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setRating(Long rating) {
-        this.rating = rating;
+    public List<String> getDirectors() {
+        return directors;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Long getRunningTime() {
+        return runningTime;
+    }
+
+    public LocalDate getReleaseYear() {
+        return releaseYear;
+    }
+
+    public Long getRating() {
+        return rating;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDirectors(List<String> directors) {
+        this.directors = directors;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setRunningTime(Long runningTime) {
+        this.runningTime = runningTime;
+    }
+
+    public void setReleaseYear(LocalDate releaseYear) {
+        this.releaseYear = releaseYear;
     }
 
 }

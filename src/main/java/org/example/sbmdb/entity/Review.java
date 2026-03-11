@@ -19,11 +19,25 @@ public class Review {
     private String reviewAuthor;
     private String reviewText;
     private LocalDate reviewDate;
+    private LocalDate reviewUpdateDate;
 
     protected Review() {}
 
+    public Review(Movie movie, Long reviewRating, String reviewAuthor, String reviewText) {
+        this.movie = movie;
+        this.reviewRating = reviewRating;
+        this.reviewAuthor = reviewAuthor;
+        this.reviewText = reviewText;
+        this.reviewDate = LocalDate.now();
+        this.reviewUpdateDate = LocalDate.now();
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public Movie getMovie() {
+        return movie;
     }
 
     public Long getReviewRating() {
@@ -42,6 +56,10 @@ public class Review {
         return reviewDate;
     }
 
+    public LocalDate getReviewUpdateDate() {
+        return reviewUpdateDate;
+    }
+
     public void setReviewRating(Long reviewRating) {
         this.reviewRating = reviewRating;
     }
@@ -56,6 +74,10 @@ public class Review {
 
     public void setReviewDate(LocalDate reviewDate) {
         this.reviewDate = reviewDate;
+    }
+
+    public void setReviewUpdateDate(LocalDate reviewUpdateDate) {
+        this.reviewUpdateDate = reviewUpdateDate;
     }
 
 }
