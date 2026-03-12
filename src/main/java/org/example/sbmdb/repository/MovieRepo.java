@@ -31,13 +31,13 @@ public interface MovieRepo extends ListCrudRepository<Movie, Long> {
     List<Movie> findByReleaseYearLessThanEqual(LocalDate releaseYearHigh, Pageable pageable);
     List<Movie> findByReleaseYearBetween(LocalDate releaseYearLow, LocalDate releaseYearHigh, Pageable pageable);
 
-    List<Movie> findByRatingGreaterThanEqual(Long ratingLow, Pageable pageable);
-    List<Movie> findByRatingLessThanEqual(Long ratingHigh, Pageable pageable);
-    List<Movie> findByRatingBetween(Long ratingLow, Long ratingHigh, Pageable pageable);
+    List<Movie> findByRatingGreaterThanEqual(Double ratingLow, Pageable pageable);
+    List<Movie> findByRatingLessThanEqual(Double ratingHigh, Pageable pageable);
+    List<Movie> findByRatingBetween(Double ratingLow, Long ratingHigh, Pageable pageable);
 
     boolean existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(String title, List<String> directors, LocalDate releaseYear);
 
     default boolean isUnique(Movie movie){
-        return existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(movie.getTitle(), movie.getDirectors(), movie.getReleaseYear());
+        return !existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(movie.getTitle(), movie.getDirectors(), movie.getReleaseYear());
     }
 }

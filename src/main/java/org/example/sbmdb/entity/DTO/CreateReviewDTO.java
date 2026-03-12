@@ -1,14 +1,12 @@
 package org.example.sbmdb.entity.DTO;
 
-import org.example.sbmdb.entity.Movie;
-
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CreateReviewDTO(
-        Movie movie,
-        Long reviewRating,
-        String reviewAuthor,
-        String reviewText,
-        LocalDate reviewDate
+        @NotNull Long movieId,
+        @NotNull Long reviewRating,
+        @NotBlank String reviewAuthor,
+        String reviewText
 ) {
 }

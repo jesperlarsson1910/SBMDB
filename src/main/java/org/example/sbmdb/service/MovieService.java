@@ -9,6 +9,7 @@ import org.example.sbmdb.entity.mapper.MovieMapper;
 import org.example.sbmdb.error.*;
 import org.example.sbmdb.repository.MovieRepo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MovieService {
@@ -26,7 +27,7 @@ public class MovieService {
             throw new DuplicateEntityException("Movie");
         }
 
-        movieRepo.save(MovieMapper.createMovie(dto));
+        movieRepo.save(movie);
     }
 
     public Movie getMovie(Long id){
@@ -38,6 +39,7 @@ public class MovieService {
         return MovieMapper.createMovieDTO(getMovie(id));
     }
 
+    @Transactional
     public void update(UpdateMovieDTO dto){
         Movie movie = getMovie(dto.id());
 
@@ -45,9 +47,17 @@ public class MovieService {
         movieRepo.save(movie);
     }
 
+    @Transactional
     public void delete(Long id){
         Movie movie = getMovie(id);
 
         movieRepo.delete(movie);
+    }
+
+    @Transactional
+    public void updateMovieRating(Long id) {
+        Movie movie = getMovie(id);
+        movie.updateRating();
+        movieRepo.save(movie);
     }
 }

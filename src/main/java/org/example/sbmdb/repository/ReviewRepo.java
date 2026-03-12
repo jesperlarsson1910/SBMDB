@@ -23,6 +23,6 @@ public interface ReviewRepo extends ListCrudRepository<Review, Long> {
     boolean existsByReviewAuthorIgnoreCaseAndMovieId(String reviewAuthor, Long movieId);
 
     default boolean isUnique(Review review) {
-        return existsByReviewAuthorIgnoreCaseAndMovieId(review.getReviewAuthor(), review.getMovie().getId());
+        return !existsByReviewAuthorIgnoreCaseAndMovieId(review.getReviewAuthor(), review.getMovie().getId());
     }
 }

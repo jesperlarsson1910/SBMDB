@@ -1,13 +1,17 @@
 package org.example.sbmdb.entity.DTO;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 import java.util.List;
 
 public record CreateMovieDTO(
-        String title,
-        List<String> directors,
+        @NotBlank String title,
+        @NotEmpty List<String> directors,
         String description,
-        Long runningTime,
-        LocalDate releaseYear
+        @NotNull Long runningTime,
+        @NotNull LocalDate releaseYear
 ) {
 }

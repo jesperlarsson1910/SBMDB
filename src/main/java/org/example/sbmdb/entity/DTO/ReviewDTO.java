@@ -5,7 +5,8 @@ import org.example.sbmdb.entity.Movie;
 import java.time.LocalDate;
 
 public record ReviewDTO(
-        Movie movie,
+        Long id,
+        Long movieId,
         Long reviewRating,
         String reviewAuthor,
         String reviewText,

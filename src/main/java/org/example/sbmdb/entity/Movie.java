@@ -11,18 +11,22 @@ import java.util.List;
 public class Movie {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false)
     private String title;
 
+    @ElementCollection
+    @CollectionTable(name = "movie_directors", joinColumns = @JoinColumn(name = "movie_id"))
+    @Column(name = "director")
     private List<String> directors;
+
     private String description;
     private Long runningTime;
     private LocalDate releaseYear;
-    private Long rating;
+    private Double rating;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
@@ -61,7 +65,7 @@ public class Movie {
         return releaseYear;
     }
 
-    public Long getRating() {
+    public Double getRating() {
         return rating;
     }
 
@@ -87,6 +91,13 @@ public class Movie {
 
     public void setReleaseYear(LocalDate releaseYear) {
         this.releaseYear = releaseYear;
+    }
+
+    public void updateRating() {
+        this.rating = reviews.stream()
+                .mapToLong(Review::getReviewRating)
+                .average()
+                .orElse(0.0);
     }
 
 }
