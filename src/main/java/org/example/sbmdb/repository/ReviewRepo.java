@@ -19,4 +19,10 @@ public interface ReviewRepo extends ListCrudRepository<Review, Long> {
     List<Review> findByReviewRatingBetween(Long reviewRatingLow, Long reviewRatingHigh, Pageable pageable);
 
     List<Review> findByReviewAuthor(String reviewAuthor, Pageable pageable);
+
+    boolean existsByReviewAuthorIgnoreCaseAndMovieId(String reviewAuthor, Long movieId);
+
+    default boolean isUnique(Review review) {
+        return existsByReviewAuthorIgnoreCaseAndMovieId(review.getReviewAuthor(), review.getMovie().getId());
+    }
 }

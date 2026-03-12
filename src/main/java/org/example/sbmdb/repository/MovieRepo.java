@@ -1,6 +1,7 @@
 package org.example.sbmdb.repository;
 
 import org.example.sbmdb.entity.Movie;
+import org.springframework.core.annotation.AliasFor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -15,8 +16,8 @@ public interface MovieRepo extends ListCrudRepository<Movie, Long> {
     List<Movie> findByTitle(String title, Pageable pageable);
     List<Movie> findByTitleContaining(String title, Pageable pageable);
 
-    List<Movie> findByDirector(String director, Pageable pageable);
-    List<Movie> findByDirectorContaining(String director, Pageable pageable);
+    List<Movie> findByDirectors(List<String> directors, Pageable pageable);
+    List<Movie> findByDirectorsContaining(String director, Pageable pageable);
 
     List<Movie> findByDescriptionContaining(String description, Pageable pageable);
 
@@ -33,4 +34,10 @@ public interface MovieRepo extends ListCrudRepository<Movie, Long> {
     List<Movie> findByRatingGreaterThanEqual(Long ratingLow, Pageable pageable);
     List<Movie> findByRatingLessThanEqual(Long ratingHigh, Pageable pageable);
     List<Movie> findByRatingBetween(Long ratingLow, Long ratingHigh, Pageable pageable);
+
+    boolean existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(String title, List<String> directors, LocalDate releaseYear);
+
+    default boolean isUnique(Movie movie){
+        return existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(movie.getTitle(), movie.getDirectors(), movie.getReleaseYear());
+    }
 }
