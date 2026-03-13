@@ -1,7 +1,9 @@
 package org.example.sbmdb.repository;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import org.example.sbmdb.entity.Movie;
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -13,31 +15,34 @@ import java.util.List;
 @Repository
 public interface MovieRepo extends ListCrudRepository<Movie, Long> {
 
-    List<Movie> findByTitle(String title, Pageable pageable);
-    List<Movie> findByTitleContaining(String title, Pageable pageable);
+    Page<Movie> findAll(Pageable pageable);
 
-    List<Movie> findByDirectors(List<String> directors, Pageable pageable);
-    List<Movie> findByDirectorsContaining(String director, Pageable pageable);
+    Page<Movie> findByTitle(String title, Pageable pageable);
+    Page<Movie> findByTitleContaining(String title, Pageable pageable);
 
-    List<Movie> findByDescriptionContaining(String description, Pageable pageable);
+    Page<Movie> findByDirectors(List<String> directors, Pageable pageable);
+    Page<Movie> findByDirectorsContaining(String director, Pageable pageable);
 
-    List<Movie> findByRunningTimeGreaterThanEqual(Long runningTimeLow, Pageable pageable);
-    List<Movie> findByRunningTimeLessThanEqual(Long runningTimeHigh, Pageable pageable);
-    List<Movie> findByRunningTimeBetween(Long runningTimeLow, Long runningTimeHigh, Pageable pageable);
+    Page<Movie> findByDescriptionContaining(String description, Pageable pageable);
 
-    List<Movie> findByReleaseYear(LocalDate releaseYear, Pageable pageable);
+    Page<Movie> findByRunningTimeGreaterThanEqual(Long runningTimeLow, Pageable pageable);
+    Page<Movie> findByRunningTimeLessThanEqual(Long runningTimeHigh, Pageable pageable);
+    Page<Movie> findByRunningTimeBetween(Long runningTimeLow, Long runningTimeHigh, Pageable pageable);
 
-    List<Movie> findByReleaseYearGreaterThanEqual(LocalDate releaseYearLow, Pageable pageable);
-    List<Movie> findByReleaseYearLessThanEqual(LocalDate releaseYearHigh, Pageable pageable);
-    List<Movie> findByReleaseYearBetween(LocalDate releaseYearLow, LocalDate releaseYearHigh, Pageable pageable);
+    Page<Movie> findByReleaseYear(LocalDate releaseYear, Pageable pageable);
 
-    List<Movie> findByRatingGreaterThanEqual(Double ratingLow, Pageable pageable);
-    List<Movie> findByRatingLessThanEqual(Double ratingHigh, Pageable pageable);
-    List<Movie> findByRatingBetween(Double ratingLow, Long ratingHigh, Pageable pageable);
+    Page<Movie> findByReleaseYearGreaterThanEqual(LocalDate releaseYearLow, Pageable pageable);
+    Page<Movie> findByReleaseYearLessThanEqual(LocalDate releaseYearHigh, Pageable pageable);
+    Page<Movie> findByReleaseYearBetween(LocalDate releaseYearLow, LocalDate releaseYearHigh, Pageable pageable);
+
+    Page<Movie> findByRatingGreaterThanEqual(Double ratingLow, Pageable pageable);
+    Page<Movie> findByRatingLessThanEqual(Double ratingHigh, Pageable pageable);
+    Page<Movie> findByRatingBetween(Double low, Double high, Pageable pageable);
 
     boolean existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(String title, List<String> directors, LocalDate releaseYear);
 
     default boolean isUnique(Movie movie){
         return !existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(movie.getTitle(), movie.getDirectors(), movie.getReleaseYear());
     }
+
 }

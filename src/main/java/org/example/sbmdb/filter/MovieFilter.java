@@ -10,7 +10,7 @@ public record MovieFilter(
         Long runningTimeHigh,
         LocalDate releaseBefore,
         LocalDate releaseAfter,
-        Long ratingLow,
-        Long ratingHigh
+        Double ratingLow,
+        Double ratingHigh
 ) {
 }

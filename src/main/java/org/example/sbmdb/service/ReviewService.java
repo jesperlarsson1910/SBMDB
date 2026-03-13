@@ -8,6 +8,8 @@ import org.example.sbmdb.entity.Review;
 import org.example.sbmdb.entity.mapper.ReviewMapper;
 import org.example.sbmdb.error.*;
 import org.example.sbmdb.repository.ReviewRepo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,41 +24,52 @@ public class ReviewService {
         this.movieService = movieService;
     }
 
+    @Transactional
     public void create(CreateReviewDTO dto) {
         Movie movie = movieService.getMovie(dto.movieId());
         Review review = ReviewMapper.createReview(movie, dto);
-
-        if(!reviewRepo.isUnique(review)){
-            throw new DuplicateEntityException("Review");
-        }
-
+        if (!reviewRepo.isUnique(review)) throw new DuplicateEntityException("Review");
         reviewRepo.save(review);
-        movieService.updateMovieRating(review.getMovie().getId());
+        movieService.updateMovieRating(movie.getId());
     }
 
-    public Review getReview(long id) {
-        return reviewRepo.findById(id).
-                orElseThrow(() -> new EntityNotFoundException("Review", id));
+    public Review getReview(Long id) {
+        return reviewRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Review", id));
     }
 
-    public ReviewDTO getReviewDTO(long id) {
+    public ReviewDTO getReviewDTO(Long id) {
         return ReviewMapper.createReviewDTO(getReview(id));
     }
 
     @Transactional
     public void update(UpdateReviewDTO dto) {
         Review review = getReview(dto.id());
-
         ReviewMapper.updateReview(review, dto);
         reviewRepo.save(review);
         movieService.updateMovieRating(review.getMovie().getId());
     }
 
     @Transactional
-    public void delete(long id) {
+    public void delete(Long id) {
         Review review = getReview(id);
-
+        Long movieId = review.getMovie().getId();
         reviewRepo.delete(review);
-        movieService.updateMovieRating(review.getMovie().getId());
+        movieService.updateMovieRating(movieId);
+    }
+
+    public Page<ReviewDTO> findByMovieId(Long movieId, Pageable pageable) {
+        return reviewRepo.findByMovieId(movieId, pageable)
+                .map(ReviewMapper::createReviewDTO);
+    }
+
+    public Page<ReviewDTO> findByRatingBetween(Long low, Long high, Pageable pageable) {
+        return reviewRepo.findByReviewRatingBetween(low, high, pageable)
+                .map(ReviewMapper::createReviewDTO);
+    }
+
+    public Page<ReviewDTO> findByAuthor(String author, Pageable pageable) {
+        return reviewRepo.findByReviewAuthor(author, pageable)
+                .map(ReviewMapper::createReviewDTO);
     }
 }
