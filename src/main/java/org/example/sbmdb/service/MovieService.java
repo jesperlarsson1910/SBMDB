@@ -8,14 +8,13 @@ import org.example.sbmdb.entity.DTO.UpdateMovieDTO;
 import org.example.sbmdb.entity.Movie;
 import org.example.sbmdb.entity.mapper.MovieMapper;
 import org.example.sbmdb.error.*;
+import org.example.sbmdb.filter.MovieSpecification;
+import org.example.sbmdb.filter.MovieFilter;
 import org.example.sbmdb.repository.MovieRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class MovieService {
@@ -71,33 +70,8 @@ public class MovieService {
                 .map(MovieMapper::createMovieSummaryDTO);
     }
 
-    public Page<MovieSummaryDTO> findByTitle(String title, Pageable pageable) {
-        return movieRepo.findByTitleContaining(title, pageable)
-                .map(MovieMapper::createMovieSummaryDTO);
-    }
-
-    public Page<MovieSummaryDTO> findByDirector(String director, Pageable pageable) {
-        return movieRepo.findByDirectorsContaining(director, pageable)
-                .map(MovieMapper::createMovieSummaryDTO);
-    }
-
-    public Page<MovieSummaryDTO> findByDescription(String description, Pageable pageable) {
-        return movieRepo.findByDescriptionContaining(description, pageable)
-                .map(MovieMapper::createMovieSummaryDTO);
-    }
-
-    public Page<MovieSummaryDTO> findByRunningTimeBetween(Long low, Long high, Pageable pageable) {
-        return movieRepo.findByRunningTimeBetween(low, high, pageable)
-                .map(MovieMapper::createMovieSummaryDTO);
-    }
-
-    public Page<MovieSummaryDTO> findByReleaseYearBetween(LocalDate low, LocalDate high, Pageable pageable) {
-        return movieRepo.findByReleaseYearBetween(low, high, pageable)
-                .map(MovieMapper::createMovieSummaryDTO);
-    }
-
-    public Page<MovieSummaryDTO> findByRatingBetween(Double low, Double high, Pageable pageable) {
-        return movieRepo.findByRatingBetween(low, high, pageable)
+    public Page<MovieSummaryDTO> search(MovieFilter filter, Pageable pageable) {
+        return movieRepo.findAll(MovieSpecification.fromFilter(filter), pageable)
                 .map(MovieMapper::createMovieSummaryDTO);
     }
 }

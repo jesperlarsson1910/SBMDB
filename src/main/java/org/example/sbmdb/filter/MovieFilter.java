@@ -8,8 +8,8 @@ public record MovieFilter(
         String description,
         Long runningTimeLow,
         Long runningTimeHigh,
-        LocalDate releaseBefore,
-        LocalDate releaseAfter,
+        LocalDate releaseFrom,
+        LocalDate releaseTo,
         Double ratingLow,
         Double ratingHigh
 ) {

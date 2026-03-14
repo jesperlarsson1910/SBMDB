@@ -7,6 +7,8 @@ import org.example.sbmdb.entity.Movie;
 import org.example.sbmdb.entity.Review;
 import org.example.sbmdb.entity.mapper.ReviewMapper;
 import org.example.sbmdb.error.*;
+import org.example.sbmdb.filter.ReviewFilter;
+import org.example.sbmdb.filter.ReviewSpecification;
 import org.example.sbmdb.repository.ReviewRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,18 +60,8 @@ public class ReviewService {
         movieService.updateMovieRating(movieId);
     }
 
-    public Page<ReviewDTO> findByMovieId(Long movieId, Pageable pageable) {
-        return reviewRepo.findByMovieId(movieId, pageable)
-                .map(ReviewMapper::createReviewDTO);
-    }
-
-    public Page<ReviewDTO> findByRatingBetween(Long low, Long high, Pageable pageable) {
-        return reviewRepo.findByReviewRatingBetween(low, high, pageable)
-                .map(ReviewMapper::createReviewDTO);
-    }
-
-    public Page<ReviewDTO> findByAuthor(String author, Pageable pageable) {
-        return reviewRepo.findByReviewAuthor(author, pageable)
+    public Page<ReviewDTO> search(ReviewFilter filter, Pageable pageable) {
+        return reviewRepo.findAll(ReviewSpecification.fromFilter(filter), pageable)
                 .map(ReviewMapper::createReviewDTO);
     }
 }

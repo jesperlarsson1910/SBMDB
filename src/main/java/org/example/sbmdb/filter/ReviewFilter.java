@@ -6,5 +6,4 @@ public record ReviewFilter(
         Double ratingHigh,
         String author
 ) {
-
 }
