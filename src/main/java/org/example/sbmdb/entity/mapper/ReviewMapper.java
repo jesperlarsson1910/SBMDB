@@ -23,7 +23,7 @@ public class ReviewMapper {
     public static void updateReview(Review review, UpdateReviewDTO dto) {
         if (dto.reviewRating() != null) review.setReviewRating(dto.reviewRating());
         if (dto.reviewAuthor() != null && !dto.reviewAuthor().isBlank()) review.setReviewAuthor(dto.reviewAuthor());
-        dto.reviewText().ifPresent(value -> review.setReviewText(value.isBlank() ? null : value));
+        if (dto.reviewText() != null) review.setReviewText(dto.reviewText().orElse(null));
         review.setReviewUpdateDate(LocalDate.now());
     }
 

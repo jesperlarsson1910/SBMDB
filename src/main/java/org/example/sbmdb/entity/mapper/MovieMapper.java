@@ -23,7 +23,7 @@ public class MovieMapper {
         if (dto.directors() != null && !dto.directors().isEmpty()) movie.setDirectors(dto.directors());
         if (dto.runningTime() != null) movie.setRunningTime(dto.runningTime());
         if (dto.releaseYear() != null) movie.setReleaseYear(dto.releaseYear());
-        dto.description().ifPresent(value -> movie.setDescription(value.isBlank() ? null : value));
+        if (dto.description() != null) movie.setDescription(dto.description().orElse(null));
     }
 
     public static MovieDTO createMovieDTO(Movie movie) {
