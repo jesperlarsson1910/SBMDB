@@ -29,7 +29,7 @@ public class Movie {
     private Double rating;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Review> reviews = new ArrayList<>();
+    private final List<Review> reviews = new ArrayList<>();
 
     protected Movie() {}
 

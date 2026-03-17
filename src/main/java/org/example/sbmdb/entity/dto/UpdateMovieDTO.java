@@ -1,4 +1,4 @@
-package org.example.sbmdb.entity.DTO;
+package org.example.sbmdb.entity.dto;
 
 import java.time.LocalDate;
 import java.util.List;

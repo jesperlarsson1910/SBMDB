@@ -1,8 +1,8 @@
 package org.example.sbmdb.service;
 
-import org.example.sbmdb.entity.DTO.CreateReviewDTO;
-import org.example.sbmdb.entity.DTO.ReviewDTO;
-import org.example.sbmdb.entity.DTO.UpdateReviewDTO;
+import org.example.sbmdb.entity.dto.CreateReviewDTO;
+import org.example.sbmdb.entity.dto.ReviewDTO;
+import org.example.sbmdb.entity.dto.UpdateReviewDTO;
 import org.example.sbmdb.entity.Movie;
 import org.example.sbmdb.entity.Review;
 import org.example.sbmdb.error.DuplicateEntityException;
@@ -26,7 +26,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -167,6 +166,6 @@ class ReviewServiceTest {
         Page<ReviewDTO> result = reviewService.search(filter, Pageable.unpaged());
 
         assertEquals(1, result.getTotalElements());
-        assertEquals("John", result.getContent().get(0).reviewAuthor());
+        assertEquals("John", result.getContent().getFirst().reviewAuthor());
     }
 }

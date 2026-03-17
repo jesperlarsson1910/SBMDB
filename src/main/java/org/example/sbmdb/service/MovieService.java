@@ -1,10 +1,10 @@
 package org.example.sbmdb.service;
 
 
-import org.example.sbmdb.entity.DTO.CreateMovieDTO;
-import org.example.sbmdb.entity.DTO.MovieDTO;
-import org.example.sbmdb.entity.DTO.MovieSummaryDTO;
-import org.example.sbmdb.entity.DTO.UpdateMovieDTO;
+import org.example.sbmdb.entity.dto.CreateMovieDTO;
+import org.example.sbmdb.entity.dto.MovieDTO;
+import org.example.sbmdb.entity.dto.MovieSummaryDTO;
+import org.example.sbmdb.entity.dto.UpdateMovieDTO;
 import org.example.sbmdb.entity.Movie;
 import org.example.sbmdb.entity.mapper.MovieMapper;
 import org.example.sbmdb.error.*;

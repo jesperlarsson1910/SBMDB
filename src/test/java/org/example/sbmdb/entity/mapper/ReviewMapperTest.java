@@ -1,8 +1,8 @@
 package org.example.sbmdb.entity.mapper;
 
-import org.example.sbmdb.entity.DTO.CreateReviewDTO;
-import org.example.sbmdb.entity.DTO.ReviewDTO;
-import org.example.sbmdb.entity.DTO.UpdateReviewDTO;
+import org.example.sbmdb.entity.dto.CreateReviewDTO;
+import org.example.sbmdb.entity.dto.ReviewDTO;
+import org.example.sbmdb.entity.dto.UpdateReviewDTO;
 import org.example.sbmdb.entity.Movie;
 import org.example.sbmdb.entity.Review;
 import org.junit.jupiter.api.BeforeEach;

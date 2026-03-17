@@ -1,0 +1,104 @@
+@import org.example.sbmdb.entity.dto.ReviewDTO
+@import org.example.sbmdb.filter.ReviewFilter
+@import org.springframework.data.domain.Page
+@import gg.jte.Content
+
+@param Page<ReviewDTO> reviews
+@param ReviewFilter filter
+
+@template.layout(title = "Reviews", content = @`
+
+    <div class="page-header">
+        <h1 class="page-title">Reviews</h1>
+        <span style="color: var(--text-muted); font-size: 0.85rem;">${reviews.getTotalElements()} reviews</span>
+    </div>
+
+    <form class="filter-bar" method="get" action="/reviews">
+        <label>
+            <input type="text" name="author" placeholder="Author..."
+                   value="${filter.author() != null ? filter.author() : ""}"/>
+        </label>
+        <label>
+            <input type="number" name="ratingMin" placeholder="Min rating..." style="max-width: 130px;"
+                   value="${filter.ratingLow() != null ? String.valueOf(filter.ratingLow()) : ""}"/>
+        </label>
+        <label>
+            <input type="number" name="ratingMax" placeholder="Max rating..." style="max-width: 130px;"
+                   value="${filter.ratingHigh() != null ? String.valueOf(filter.ratingHigh()) : ""}"/>
+        </label>
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="/reviews" class="btn btn-ghost">Clear</a>
+    </form>
+
+    @if(reviews.isEmpty())
+        <div class="empty">
+            <div class="empty-title">No reviews found</div>
+            <p>Try adjusting your search filters.</p>
+        </div>
+    @else
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            @for(ReviewDTO review : reviews.getContent())
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                        <div>
+                            <a href="/movies/${review.movieId()}" style="font-family: var(--font-heading), serif; font-size: 1rem; color: var(--text);">
+                                ${review.movieTitle()}
+                            </a>
+                            <a href="/reviews/${review.id()}" style="font-weight: 500; font-size: 0.9rem; color: var(--text);">
+                                ${review.reviewAuthor()}
+                            </a>
+                            <span style="font-size: 0.73rem; color: var(--text-muted); margin-left: 0.75rem;">
+                                ${String.valueOf(review.reviewDate())}
+                            </span>
+                            @if(!review.reviewDate().equals(review.reviewUpdateDate()))
+                                <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 0.5rem;">
+                                    (edited ${String.valueOf(review.reviewUpdateDate())})
+                                </span>
+                            @endif
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="position: relative; display: inline-block; font-size: 0.85rem; letter-spacing: 0.1em;">
+                                <span style="color: var(--border);">★★★★★</span>
+                                <span style="position: absolute; left: 0; top: 0; overflow: hidden; width: ${review.reviewRating() * 20}%;">
+                                    <span style="color: var(--accent);">★★★★★</span>
+                                </span>
+                            </div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">${review.reviewRating()}/5</span>
+                        </div>
+                    </div>
+
+                    @if(review.reviewText() != null && !review.reviewText().isBlank())
+                        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.7;">
+                            ${review.reviewText()}
+                        </p>
+                    @endif
+
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                        <a href="/reviews/${review.id()}/edit" class="btn btn-ghost" style="font-size: 0.72rem; padding: 0.35rem 0.85rem;">Edit</a>
+                        <form method="post" action="/reviews/${review.id()}/delete" style="margin: 0;">
+                            <button type="submit" class="btn btn-danger" style="font-size: 0.72rem; padding: 0.35rem 0.85rem;">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            @endfor
+        </div>
+
+        <div class="pagination">
+            @if(!reviews.isFirst())
+                <a href="?page=${reviews.getNumber() - 1}&size=${reviews.getSize()}">←</a>
+            @endif
+
+            @for(int i = 0; i < reviews.getTotalPages(); i++)
+                @if(i == reviews.getNumber())
+                    <span class="active">${i + 1}</span>
+                @else
+                    <a href="?page=${i}&size=${reviews.getSize()}">${i + 1}</a>
+                @endif
+            @endfor
+
+            @if(!reviews.isLast())
+                <a href="?page=${reviews.getNumber() + 1}&size=${reviews.getSize()}">→</a>
+            @endif
+        </div>
+    @endif
+`)

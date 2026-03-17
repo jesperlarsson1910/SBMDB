@@ -1,4 +1,4 @@
-package org.example.sbmdb.entity.DTO;
+package org.example.sbmdb.entity.dto;
 
 import java.util.Optional;
 

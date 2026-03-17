@@ -1,6 +1,6 @@
 package org.example.sbmdb.entity.mapper;
 
-import org.example.sbmdb.entity.DTO.*;
+import org.example.sbmdb.entity.dto.*;
 import org.example.sbmdb.entity.Movie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

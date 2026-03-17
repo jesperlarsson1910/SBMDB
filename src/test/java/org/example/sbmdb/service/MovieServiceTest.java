@@ -1,9 +1,9 @@
 package org.example.sbmdb.service;
 
-import org.example.sbmdb.entity.DTO.CreateMovieDTO;
-import org.example.sbmdb.entity.DTO.MovieDTO;
-import org.example.sbmdb.entity.DTO.MovieSummaryDTO;
-import org.example.sbmdb.entity.DTO.UpdateMovieDTO;
+import org.example.sbmdb.entity.dto.CreateMovieDTO;
+import org.example.sbmdb.entity.dto.MovieDTO;
+import org.example.sbmdb.entity.dto.MovieSummaryDTO;
+import org.example.sbmdb.entity.dto.UpdateMovieDTO;
 import org.example.sbmdb.entity.Movie;
 import org.example.sbmdb.error.DuplicateEntityException;
 import org.example.sbmdb.error.EntityNotFoundException;
@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -178,7 +177,7 @@ class MovieServiceTest {
         Page<MovieSummaryDTO> result = movieService.search(filter, Pageable.unpaged());
 
         assertEquals(1, result.getTotalElements());
-        assertEquals("Inception", result.getContent().get(0).title());
+        assertEquals("Inception", result.getContent().getFirst().title());
     }
 
     @Test
