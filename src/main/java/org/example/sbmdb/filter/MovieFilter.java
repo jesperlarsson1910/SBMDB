@@ -6,11 +6,11 @@ public record MovieFilter(
         String title,
         String director,
         String description,
-        Long runningTimeLow,
-        Long runningTimeHigh,
-        LocalDate releaseFrom,
-        LocalDate releaseTo,
-        Double ratingLow,
-        Double ratingHigh
+        Long runningTimeMin,
+        Long runningTimeMax,
+        Integer releaseYearFrom,
+        Integer releaseYearTo,
+        Double ratingMin,
+        Double ratingMax
 ) {
 }

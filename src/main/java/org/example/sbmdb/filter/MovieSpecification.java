@@ -1,6 +1,7 @@
 package org.example.sbmdb.filter;
 
 import org.example.sbmdb.entity.Movie;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -32,14 +33,14 @@ public class MovieSpecification {
                 : cb.lessThanOrEqualTo(root.get("runningTime"), high);
     }
 
-    public static Specification<Movie> releaseYearFrom(LocalDate from) {
+    public static Specification<Movie> releaseYearFrom(Integer from) {
         return (root, query, cb) -> from == null ? null
-                : cb.greaterThanOrEqualTo(root.get("releaseYear"), from);
+                : cb.greaterThanOrEqualTo(root.get("releaseYear"), LocalDate.of(from, 1, 1));
     }
 
-    public static Specification<Movie> releaseYearTo(LocalDate to) {
+    public static Specification<Movie> releaseYearTo(Integer to) {
         return (root, query, cb) -> to == null ? null
-                : cb.lessThanOrEqualTo(root.get("releaseYear"), to);
+                : cb.lessThanOrEqualTo(root.get("releaseYear"), LocalDate.of(to, 1, 1));
     }
 
     public static Specification<Movie> ratingMin(Double low) {
@@ -57,11 +58,11 @@ public class MovieSpecification {
                 .where(hasTitle(filter.title()))
                 .and(hasDirector(filter.director()))
                 .and(hasDescription(filter.description()))
-                .and(runningTimeMin(filter.runningTimeLow()))
-                .and(runningTimeMax(filter.runningTimeHigh()))
-                .and(releaseYearFrom(filter.releaseFrom()))
-                .and(releaseYearTo(filter.releaseTo()))
-                .and(ratingMin(filter.ratingLow()))
-                .and(ratingMax(filter.ratingHigh()));
+                .and(runningTimeMin(filter.runningTimeMin()))
+                .and(runningTimeMax(filter.runningTimeMax()))
+                .and(releaseYearFrom(filter.releaseYearFrom()))
+                .and(releaseYearTo(filter.releaseYearTo()))
+                .and(ratingMin(filter.ratingMin()))
+                .and(ratingMax(filter.ratingMax()));
     }
 }

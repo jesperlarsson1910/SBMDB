@@ -28,8 +28,8 @@ public class ReviewSpecification {
     public static Specification<Review> fromFilter(ReviewFilter filter) {
         return Specification
                 .where(hasMovieId(filter.movieId()))
-                .and(ratingMin(filter.ratingLow()))
-                .and(ratingMax(filter.ratingHigh()))
+                .and(ratingMin(filter.ratingMin()))
+                .and(ratingMax(filter.ratingMax()))
                 .and(hasAuthor(filter.author()));
     }
 }

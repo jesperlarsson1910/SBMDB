@@ -33,7 +33,7 @@ public class ReviewMapper {
         return new ReviewDTO(
                 review.getId(),
                 review.getMovie().getId(),
-                review.getMovie().getTitle(),
+                review.getMovie().title(),
                 review.getReviewRating(),
                 review.getReviewAuthor(),
                 review.getReviewText(),

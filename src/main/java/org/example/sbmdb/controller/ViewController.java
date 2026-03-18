@@ -5,11 +5,14 @@ import org.example.sbmdb.filter.MovieFilter;
 import org.example.sbmdb.filter.ReviewFilter;
 import org.example.sbmdb.service.MovieService;
 import org.example.sbmdb.service.ReviewService;
+import org.springframework.beans.propertyeditors.CustomNumberEditor;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -29,8 +32,14 @@ public class ViewController {
         this.reviewService = reviewService;
     }
 
+//    @InitBinder
+//    public void initBinder(WebDataBinder binder) {
+//        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+//        binder.registerCustomEditor(Double.class, new CustomNumberEditor(Double.class, true));
+//        binder.registerCustomEditor(Integer.class, new CustomNumberEditor(Integer.class, true));
+//        binder.registerCustomEditor(Long.class, new CustomNumberEditor(Long.class, true));
+//    }
     // --- MOVIE VIEWS ---
-
     @GetMapping("/")
     public String movies(MovieFilter filter,
                          @PageableDefault(size = 20, sort = "title", direction = Sort.Direction.ASC) Pageable pageable,

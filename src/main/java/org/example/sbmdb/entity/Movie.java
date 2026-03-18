@@ -45,15 +45,15 @@ public class Movie {
         return id;
     }
 
-    public String getTitle() {
+    public String title() {
         return title;
     }
 
-    public List<String> getDirectors() {
+    public List<String> directors() {
         return directors;
     }
 
-    public String getDescription() {
+    public String description() {
         return description;
     }
 

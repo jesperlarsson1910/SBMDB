@@ -16,15 +16,15 @@
     <form class="filter-bar" method="get" action="/reviews">
         <label>
             <input type="text" name="author" placeholder="Author..."
-                   value="${filter.author() != null ? filter.author() : ""}"/>
+                   value="${filter.getAuthor() != null ? filter.getAuthor() : ""}"/>
         </label>
         <label>
             <input type="number" name="ratingMin" placeholder="Min rating..." style="max-width: 130px;"
-                   value="${filter.ratingLow() != null ? String.valueOf(filter.ratingLow()) : ""}"/>
+                   value="${filter.ratingMin() != null ? String.valueOf(filter.ratingMin()) : ""}"/>
         </label>
         <label>
             <input type="number" name="ratingMax" placeholder="Max rating..." style="max-width: 130px;"
-                   value="${filter.ratingHigh() != null ? String.valueOf(filter.ratingHigh()) : ""}"/>
+                   value="${filter.ratingMax() != null ? String.valueOf(filter.ratingMax()) : ""}"/>
         </label>
         <button type="submit" class="btn btn-primary">Search</button>
         <a href="/reviews" class="btn btn-ghost">Clear</a>

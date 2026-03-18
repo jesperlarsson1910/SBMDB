@@ -15,7 +15,7 @@ public interface MovieRepo extends JpaRepository<Movie, Long>, JpaSpecificationE
     boolean existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(String title, List<String> directors, LocalDate releaseYear);
 
     default boolean isUnique(Movie movie){
-        return !existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(movie.getTitle(), movie.getDirectors(), movie.getReleaseYear());
+        return !existsByTitleIgnoreCaseAndDirectorsIgnoreCaseAndReleaseYear(movie.title(), movie.directors(), movie.getReleaseYear());
     }
 
 }

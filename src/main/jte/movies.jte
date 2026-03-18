@@ -22,19 +22,19 @@
         </label>
         <label>
             <input type="number" name="releaseYearFrom" placeholder="Year from..." style="max-width: 130px;"
-                   value="${filter.releaseFrom() != null ? String.valueOf(filter.releaseFrom().getYear()) : ""}"/>
+                   value="${filter.releaseYearFrom() != null ? String.valueOf(filter.releaseYearFrom()) : ""}"/>
         </label>
         <label>
             <input type="number" name="releaseYearTo" placeholder="Year to..." style="max-width: 130px;"
-                   value="${filter.releaseTo() != null ? String.valueOf(filter.releaseTo().getYear()) : ""}"/>
+                   value="${filter.releaseYearTo() != null ? String.valueOf(filter.releaseYearTo()) : ""}"/>
         </label>
         <label>
             <input type="number" name="ratingMin" placeholder="Min rating..." step="0.1" style="max-width: 120px;"
-                   value="${filter.ratingLow() != null ? String.valueOf(filter.ratingLow()) : ""}"/>
+                   value="${filter.ratingMin() != null ? String.valueOf(filter.ratingMin()) : ""}"/>
         </label>
         <label>
             <input type="number" name="ratingMax" placeholder="Max rating..." step="0.1" style="max-width: 120px;"
-                   value="${filter.ratingHigh() != null ? String.valueOf(filter.ratingHigh()) : ""}"/>
+                   value="${filter.ratingMax() != null ? String.valueOf(filter.ratingMax()) : ""}"/>
         </label>
         <button type="submit" class="btn btn-primary">Search</button>
         <a href="/" class="btn btn-ghost">Clear</a>

@@ -31,9 +31,9 @@ public class MovieMapper {
     public static MovieDTO createMovieDTO(Movie movie) {
         return new MovieDTO(
                 movie.getId(),
-                movie.getTitle(),
-                movie.getDirectors(),
-                movie.getDescription(),
+                movie.title(),
+                movie.directors(),
+                movie.description(),
                 movie.getRunningTime(),
                 movie.getReleaseYear(),
                 movie.getRating(),
@@ -44,8 +44,8 @@ public class MovieMapper {
     public static MovieSummaryDTO createMovieSummaryDTO(Movie movie) {
         return new MovieSummaryDTO(
                 movie.getId(),
-                movie.getTitle(),
-                movie.getDirectors(),
+                movie.title(),
+                movie.directors(),
                 movie.getReleaseYear(),
                 movie.getRating()
         );
