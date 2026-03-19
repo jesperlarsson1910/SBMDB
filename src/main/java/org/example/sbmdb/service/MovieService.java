@@ -71,6 +71,14 @@ public class MovieService {
     }
 
     public Page<MovieSummaryDTO> search(MovieFilter filter, Pageable pageable) {
+        if (filter.ratingMin() != null && filter.ratingMax() != null
+                && filter.ratingMin() > filter.ratingMax()) {
+            throw new IllegalArgumentException("Min cannot be greater than Max");
+        }
+        if (filter.releaseYearFrom() != null && filter.releaseYearTo() != null
+                && filter.releaseYearFrom() > filter.releaseYearTo()) {
+            throw new IllegalArgumentException("From cannot be greater than To");
+        }
         return movieRepo.findAll(MovieSpecification.fromFilter(filter), pageable)
                 .map(MovieMapper::createMovieSummaryDTO);
     }

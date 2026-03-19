@@ -61,6 +61,10 @@ public class ReviewService {
     }
 
     public Page<ReviewDTO> search(ReviewFilter filter, Pageable pageable) {
+        if (filter.ratingMin() != null && filter.ratingMax() != null
+                && filter.ratingMin() > filter.ratingMax()) {
+            throw new IllegalArgumentException("Min cannot be greater than Max");
+        }
         return reviewRepo.findAll(ReviewSpecification.fromFilter(filter), pageable)
                 .map(ReviewMapper::createReviewDTO);
     }

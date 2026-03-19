@@ -5,6 +5,7 @@
 
 @param Page<MovieSummaryDTO> movies
 @param MovieFilter filter
+@param String error = null
 
 @template.layout(title = "Movies", content = @`
 
@@ -12,6 +13,19 @@
         <h1 class="page-title">Movies</h1>
         <span style="color: var(--text-muted); font-size: 0.85rem;">${movies.getTotalElements()} titles</span>
     </div>
+
+    @if(error != null)
+        <div style="
+            background: rgba(192, 57, 43, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 0.75rem 1.25rem;
+            border-radius: 3px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;">
+            ${error}
+        </div>
+    @endif
 
     <form class="filter-bar" method="get" action="/">
         <label>
@@ -29,11 +43,11 @@
                    value="${filter.releaseYearTo() != null ? String.valueOf(filter.releaseYearTo()) : ""}"/>
         </label>
         <label>
-            <input type="number" name="ratingMin" placeholder="Min rating..." step="0.1" style="max-width: 120px;"
+            <input type="number" name="ratingMin" placeholder="Min rating..." step="0.1" min="0" max="5" style="max-width: 120px;"
                    value="${filter.ratingMin() != null ? String.valueOf(filter.ratingMin()) : ""}"/>
         </label>
         <label>
-            <input type="number" name="ratingMax" placeholder="Max rating..." step="0.1" style="max-width: 120px;"
+            <input type="number" name="ratingMax" placeholder="Max rating..." step="0.1" min="0" max="5" style="max-width: 120px;"
                    value="${filter.ratingMax() != null ? String.valueOf(filter.ratingMax()) : ""}"/>
         </label>
         <button type="submit" class="btn btn-primary">Search</button>

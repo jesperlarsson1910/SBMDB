@@ -5,6 +5,7 @@
 
 @param Page<ReviewDTO> reviews
 @param ReviewFilter filter
+@param String error = null
 
 @template.layout(title = "Reviews", content = @`
 
@@ -13,17 +14,30 @@
         <span style="color: var(--text-muted); font-size: 0.85rem;">${reviews.getTotalElements()} reviews</span>
     </div>
 
+    @if(error != null)
+        <div style="
+            background: rgba(192, 57, 43, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 0.75rem 1.25rem;
+            border-radius: 3px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;">
+            ${error}
+        </div>
+    @endif
+
     <form class="filter-bar" method="get" action="/reviews">
         <label>
             <input type="text" name="author" placeholder="Author..."
-                   value="${filter.getAuthor() != null ? filter.getAuthor() : ""}"/>
+                   value="${filter.author() != null ? filter.author() : ""}"/>
         </label>
         <label>
-            <input type="number" name="ratingMin" placeholder="Min rating..." style="max-width: 130px;"
+            <input type="number" name="ratingMin" placeholder="Min rating..." step="0.1" style="max-width: 130px;"
                    value="${filter.ratingMin() != null ? String.valueOf(filter.ratingMin()) : ""}"/>
         </label>
         <label>
-            <input type="number" name="ratingMax" placeholder="Max rating..." style="max-width: 130px;"
+            <input type="number" name="ratingMax" placeholder="Max rating..." step="0.1" style="max-width: 130px;"
                    value="${filter.ratingMax() != null ? String.valueOf(filter.ratingMax()) : ""}"/>
         </label>
         <button type="submit" class="btn btn-primary">Search</button>

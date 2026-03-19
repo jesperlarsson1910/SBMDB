@@ -7,6 +7,7 @@ import org.example.sbmdb.service.MovieService;
 import org.example.sbmdb.service.ReviewService;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -32,19 +33,27 @@ public class ViewController {
         this.reviewService = reviewService;
     }
 
-//    @InitBinder
-//    public void initBinder(WebDataBinder binder) {
-//        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-//        binder.registerCustomEditor(Double.class, new CustomNumberEditor(Double.class, true));
-//        binder.registerCustomEditor(Integer.class, new CustomNumberEditor(Integer.class, true));
-//        binder.registerCustomEditor(Long.class, new CustomNumberEditor(Long.class, true));
-//    }
     // --- MOVIE VIEWS ---
     @GetMapping("/")
-    public String movies(MovieFilter filter,
-                         @PageableDefault(size = 20, sort = "title", direction = Sort.Direction.ASC) Pageable pageable,
-                         Model model) {
-        model.addAttribute("movies", movieService.search(filter, pageable));
+    public String movies(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String director,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Long runningTimeMin,
+            @RequestParam(required = false) Long runningTimeMax,
+            @RequestParam(required = false) Integer releaseYearFrom,
+            @RequestParam(required = false) Integer releaseYearTo,
+            @RequestParam(required = false) Double ratingMin,
+            @RequestParam(required = false) Double ratingMax,
+            @PageableDefault(size = 20, sort = "title", direction = Sort.Direction.ASC) Pageable pageable,
+            Model model) {
+        MovieFilter filter = new MovieFilter(title, director, description, runningTimeMin, runningTimeMax, releaseYearFrom, releaseYearTo, ratingMin, ratingMax);
+        try {
+            model.addAttribute("movies", movieService.search(filter, pageable));
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("movies", Page.empty());
+            model.addAttribute("error", e.getMessage());
+        }
         model.addAttribute("filter", filter);
         return "movies";
     }
@@ -119,10 +128,20 @@ public class ViewController {
     // --- REVIEW VIEWS ---
 
     @GetMapping("/reviews")
-    public String reviews(ReviewFilter filter,
-                          @PageableDefault(size = 20, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable,
-                          Model model) {
-        model.addAttribute("reviews", reviewService.search(filter, pageable));
+    public String reviews(
+            @RequestParam(required = false) Long movieId,
+            @RequestParam(required = false) Double ratingMin,
+            @RequestParam(required = false) Double ratingMax,
+            @RequestParam(required = false) String author,
+            @PageableDefault(size = 20, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable,
+            Model model) {
+        ReviewFilter filter = new ReviewFilter(movieId, ratingMin, ratingMax, author);
+        try {
+            model.addAttribute("reviews", reviewService.search(filter, pageable));
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("reviews", Page.empty());
+            model.addAttribute("error", e.getMessage());
+        }
         model.addAttribute("filter", filter);
         return "reviews";
     }

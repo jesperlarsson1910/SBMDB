@@ -35,7 +35,7 @@
         <div class="form-group">
             <label for="reviewRating">Rating (1–5)</label>
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <input type="range" id="reviewRating" name="reviewRating" min="1" max="5" step="1"
+                <input type="range" id="reviewRating" name="reviewRating" min="1" max="5" step="0.5"
                        value="${ratingValue}"
                        style="flex: 1;"
                        oninput="document.getElementById('ratingDisplay').textContent = this.value"/>
