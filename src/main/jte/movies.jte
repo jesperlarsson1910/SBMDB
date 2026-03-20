@@ -6,8 +6,21 @@
 @param Page<MovieSummaryDTO> movies
 @param MovieFilter filter
 @param String error = null
+@param org.springframework.data.domain.Pageable pageable
 
 @template.layout(title = "Movies", content = @`
+
+    !{String query = "";}
+    !{if (filter.title() != null && !filter.title().isBlank()) query += "&title=" + filter.title();}
+    !{if (filter.director() != null && !filter.director().isBlank()) query += "&director=" + filter.director();}
+    !{if (filter.description() != null && !filter.description().isBlank()) query += "&description=" + filter.description();}
+    !{if (filter.runningTimeMin() != null) query += "&runningTimeMin=" + filter.runningTimeMin();}
+    !{if (filter.runningTimeMax() != null) query += "&runningTimeMax=" + filter.runningTimeMax();}
+    !{if (filter.releaseYearFrom() != null) query += "&releaseYearFrom=" + filter.releaseYearFrom();}
+    !{if (filter.releaseYearTo() != null) query += "&releaseYearTo=" + filter.releaseYearTo();}
+    !{if (filter.ratingMin() != null) query += "&ratingMin=" + filter.ratingMin();}
+    !{if (filter.ratingMax() != null) query += "&ratingMax=" + filter.ratingMax();}
+    !{String sortQuery = pageable.getSort().isSorted() ? "&sort=" + pageable.getSort().toString().replace(": ", ",") : "";}
 
     <div class="page-header">
         <h1 class="page-title">Movies</h1>
@@ -50,8 +63,19 @@
             <input type="number" name="ratingMax" placeholder="Max rating..." step="0.1" min="0" max="5" style="max-width: 120px;"
                    value="${filter.ratingMax() != null ? String.valueOf(filter.ratingMax()) : ""}"/>
         </label>
+
         <button type="submit" class="btn btn-primary">Search</button>
         <a href="/" class="btn btn-ghost">Clear</a>
+        <select name="sort" onchange="this.form.submit()" style="width: 150px;">
+            <option value="title,asc">Title A-Z</option>
+            <option value="title,desc">Title Z-A</option>
+            <option value="releaseYear,desc">Newest First</option>
+            <option value="releaseYear,asc">Oldest First</option>
+            <option value="rating,desc">Highest Rated</option>
+            <option value="rating,asc">Lowest Rated</option>
+            <option value="runningTime,asc">Shortest First</option>
+            <option value="runningTime,desc">Longest First</option>
+        </select>
     </form>
 
     @if(movies.isEmpty())
@@ -75,11 +99,11 @@
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <div style="position: relative; display: inline-block; font-size: 0.9rem; letter-spacing: 0.1em;">
                                         <span style="color: var(--border);">★★★★★</span>
-                                        <span style="position: absolute; left: 0; top: 0; overflow: hidden; width: ${String.format("%.1f", movie.rating() / 5.0 * 100)}%;">
+                                        <span style="position: absolute; left: 0; top: 0; overflow: hidden; width: ${String.format(java.util.Locale.US, "%.1f", movie.rating() / 5.0 * 100)}%;">
                                             <span style="color: var(--accent);">★★★★★</span>
                                         </span>
                                     </div>
-                                    <span style="font-size: 0.8rem; color: var(--text-muted);">${String.format("%.1f", movie.rating())}</span>
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">${String.format(java.util.Locale.US, "%.1f", movie.rating())}</span>
                                 </div>
                             @else
                                 <span style="font-size: 0.75rem; color: var(--text-muted);">No ratings yet</span>
@@ -92,19 +116,19 @@
 
         <div class="pagination">
             @if(!movies.isFirst())
-                <a href="?page=${movies.getNumber() - 1}&size=${movies.getSize()}">←</a>
+                <a href="?page=${movies.getNumber() - 1}&size=${movies.getSize()}${query}${sortQuery}">←</a>
             @endif
 
             @for(int i = 0; i < movies.getTotalPages(); i++)
                 @if(i == movies.getNumber())
                     <span class="active">${i + 1}</span>
                 @else
-                    <a href="?page=${i}&size=${movies.getSize()}">${i + 1}</a>
+                    <a href="?page=${i}&size=${movies.getSize()}${query}${sortQuery}">${i + 1}</a>
                 @endif
             @endfor
 
             @if(!movies.isLast())
-                <a href="?page=${movies.getNumber() + 1}&size=${movies.getSize()}">→</a>
+                <a href="?page=${movies.getNumber() + 1}&size=${movies.getSize()}${query}${sortQuery}">→</a>
             @endif
         </div>
     @endif

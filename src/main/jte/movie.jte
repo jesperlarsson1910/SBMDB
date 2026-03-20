@@ -22,11 +22,11 @@
                 <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
                     <div style="position: relative; display: inline-block; font-size: 1.2rem; letter-spacing: 0.15em;">
                         <span style="color: var(--border);">★★★★★</span>
-                        <span style="position: absolute; left: 0; top: 0; overflow: hidden; width: ${String.format("%.1f", movie.rating() / 5.0 * 100)}%;">
+                        <span style="position: absolute; left: 0; top: 0; overflow: hidden; width: ${String.format(java.util.Locale.US, "%.1f", movie.rating() / 5.0 * 100)}%;">
                             <span style="color: var(--accent);">★★★★★</span>
                         </span>
                     </div>
-                    <span style="font-size: 1rem; color: var(--text-muted);">${String.format("%.1f", movie.rating())} / 5.0</span>
+                    <span style="font-size: 1rem; color: var(--text-muted);">${String.format(java.util.Locale.US, "%.1f", movie.rating())} / 5.0</span>
                     <span style="font-size: 0.8rem; color: var(--text-muted);">(${movie.reviews().size()} reviews)</span>
                 </div>
             @else
@@ -42,14 +42,27 @@
         <div style="display: flex; gap: 0.75rem;">
             <a href="/movies/${movie.id()}/edit" class="btn btn-ghost">Edit</a>
             <form method="post" action="/movies/${movie.id()}/delete" style="margin: 0;">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to delete ${movie.title()}? This will also delete all its reviews.')">
+                    Delete
+                </button>
             </form>
         </div>
     </div>
 
     <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem;">
         <h2 style="font-family: var(--font-heading), serif; font-size: 1.5rem; font-weight: 400;">Reviews</h2>
-        <a href="/movies/${movie.id()}/review" class="btn btn-primary">+ Add Review</a>
+        <div style="display: flex; gap: 0.75rem; align-items: stretch;">
+            <form method="get" action="/movies/${movie.id()}" style="margin: 0;">
+                <select name="sort" onchange="this.form.submit()" style="width: 150px; height: 100%;">
+                    <option value="reviewDate,desc">Newest First</option>
+                    <option value="reviewDate,asc">Oldest First</option>
+                    <option value="reviewRating,desc">Highest Rated</option>
+                    <option value="reviewRating,asc">Lowest Rated</option>
+                </select>
+            </form>
+            <a href="/movies/${movie.id()}/review" class="btn btn-primary" style="align-self: stretch; display: flex; align-items: center;">+ Add Review</a>
+        </div>
     </div>
 
     @if(movie.reviews().isEmpty())
@@ -66,10 +79,12 @@
                             <a href="/reviews/${review.id()}" style="font-weight: 500; font-size: 0.9rem; color: var(--text);">
                                 ${review.reviewAuthor()}
                             </a>
-                            <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.75rem;">${String.valueOf(review.reviewDate())}</span>
-                            @if(!review.reviewDate().equals(review.reviewUpdateDate()))
-                                <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 0.5rem;">(edited ${String.valueOf(review.reviewUpdateDate())})</span>
-                            @endif
+                            <span style="font-size: 0.73rem; color: var(--text-muted); margin-left: 0.75rem;">
+                                ${String.valueOf(review.reviewUpdateDate())}
+                                @if(!review.reviewDate().equals(review.reviewUpdateDate()))
+                                    <span style="color: var(--text-muted);">(posted ${String.valueOf(review.reviewDate())})</span>
+                                @endif
+                            </span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <div style="position: relative; display: inline-block; font-size: 0.85rem; letter-spacing: 0.1em;">
@@ -87,7 +102,10 @@
                     <div style="display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
                         <a href="/reviews/${review.id()}/edit" class="btn btn-ghost" style="font-size: 0.72rem; padding: 0.35rem 0.85rem;">Edit</a>
                         <form method="post" action="/reviews/${review.id()}/delete" style="margin: 0;">
-                            <button type="submit" class="btn btn-danger" style="font-size: 0.72rem; padding: 0.35rem 0.85rem;">Delete</button>
+                            <button type="submit" class="btn btn-danger" style="font-size: 0.72rem; padding: 0.35rem 0.85rem;"
+                                    onclick="return confirm('Are you sure you want to delete this review by ${review.reviewAuthor()}?')">
+                                Delete
+                            </button>
                         </form>
                     </div>
                 </div>

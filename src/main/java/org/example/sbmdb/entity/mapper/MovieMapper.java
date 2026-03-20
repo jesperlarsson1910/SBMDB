@@ -1,10 +1,13 @@
 package org.example.sbmdb.entity.mapper;
 
+import org.example.sbmdb.entity.Review;
 import org.example.sbmdb.entity.dto.CreateMovieDTO;
 import org.example.sbmdb.entity.dto.MovieDTO;
 import org.example.sbmdb.entity.dto.MovieSummaryDTO;
 import org.example.sbmdb.entity.dto.UpdateMovieDTO;
 import org.example.sbmdb.entity.Movie;
+
+import java.util.List;
 
 public class MovieMapper {
 
@@ -31,9 +34,9 @@ public class MovieMapper {
     public static MovieDTO createMovieDTO(Movie movie) {
         return new MovieDTO(
                 movie.getId(),
-                movie.title(),
-                movie.directors(),
-                movie.description(),
+                movie.getTitle(),
+                movie.getDirectors(),
+                movie.getDescription(),
                 movie.getRunningTime(),
                 movie.getReleaseYear(),
                 movie.getRating(),
@@ -44,10 +47,23 @@ public class MovieMapper {
     public static MovieSummaryDTO createMovieSummaryDTO(Movie movie) {
         return new MovieSummaryDTO(
                 movie.getId(),
-                movie.title(),
-                movie.directors(),
+                movie.getTitle(),
+                movie.getDirectors(),
                 movie.getReleaseYear(),
                 movie.getRating()
+        );
+    }
+
+    public static MovieDTO createMovieDTO(Movie movie, List<Review> reviews) {
+        return new MovieDTO(
+                movie.getId(),
+                movie.getTitle(),
+                movie.getDirectors(),
+                movie.getDescription(),
+                movie.getRunningTime(),
+                movie.getReleaseYear(),
+                movie.getRating(),
+                reviews.stream().map(ReviewMapper::createReviewDTO).toList()
         );
     }
 }

@@ -71,7 +71,10 @@
 
         /* BUTTONS */
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
             padding: 0.5rem 1.25rem;
             border-radius: 2px;
             font-size: 0.8rem;

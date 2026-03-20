@@ -2,6 +2,20 @@
 @import gg.jte.Content
 
 @param MovieDTO movie = null
+@param String error = null
+
+@if(error != null && !error.isBlank())
+    <div style="
+        background: rgba(192, 57, 43, 0.1);
+        border: 1px solid var(--danger);
+        color: var(--danger);
+        padding: 0.75rem 1.25rem;
+        border-radius: 3px;
+        margin-bottom: 1.25rem;
+        font-size: 0.875rem;">
+        ${error}
+    </div>
+@endif
 
 !{String pageTitle = movie != null ? movie.title() : "Add Movie";}
 !{String backUrl = movie != null ? "/movies/" + movie.id() : "/";}

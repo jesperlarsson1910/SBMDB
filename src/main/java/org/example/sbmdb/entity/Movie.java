@@ -45,15 +45,15 @@ public class Movie {
         return id;
     }
 
-    public String title() {
+    public String getTitle() {
         return title;
     }
 
-    public List<String> directors() {
+    public List<String> getDirectors() {
         return directors;
     }
 
-    public String description() {
+    public String getDescription() {
         return description;
     }
 
@@ -95,7 +95,7 @@ public class Movie {
 
     public void updateRating() {
         this.rating = reviews.stream()
-                .mapToLong(Review::getReviewRating)
+                .mapToDouble(Review::getReviewRating)
                 .average()
                 .orElse(0.0);
     }

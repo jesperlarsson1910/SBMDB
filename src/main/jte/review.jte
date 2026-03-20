@@ -3,7 +3,7 @@
 
 @param ReviewDTO review
 
-!{String editedLabel = !review.reviewDate().equals(review.reviewUpdateDate()) ? "edited " + review.reviewUpdateDate().toString() : "";}
+!{String dateDisplay = !review.reviewDate().equals(review.reviewUpdateDate()) ? review.reviewUpdateDate().toString() + " (posted " + review.reviewDate().toString() + ")" : review.reviewDate().toString();}
 
 @template.layout(title = review.reviewAuthor() + " on " + review.movieTitle(), content = @`
 
@@ -26,16 +26,13 @@
                     ${review.reviewAuthor()}
                 </div>
                 <div style="font-size: 0.78rem; color: var(--text-muted);">
-                    ${String.valueOf(review.reviewDate())}
-                    @if(!editedLabel.isBlank())
-                        <span style="margin-left: 0.5rem;">(${editedLabel})</span>
-                    @endif
+                    ${dateDisplay}
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 0.75rem;">
                 <div style="position: relative; display: inline-block; font-size: 1.2rem; letter-spacing: 0.15em;">
                     <span style="color: var(--border);">★★★★★</span>
-                    <span style="position: absolute; left: 0; top: 0; overflow: hidden; width: ${String.valueOf(review.reviewRating() * 20)}%;">
+                    <span style="position: absolute; left: 0; top: 0; overflow: hidden; width: ${String.format(java.util.Locale.US, "%.1f", review.reviewRating() / 5.0 * 100)}%;">
                         <span style="color: var(--accent);">★★★★★</span>
                     </span>
                 </div>
@@ -58,7 +55,10 @@
         <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
             <a href="/reviews/${review.id()}/edit" class="btn btn-ghost">Edit</a>
             <form method="post" action="/reviews/${review.id()}/delete" style="margin: 0;">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to delete this review by ${review.reviewAuthor()}?')">
+                    Delete
+                </button>
             </form>
         </div>
     </div>

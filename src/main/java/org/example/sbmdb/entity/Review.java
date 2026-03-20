@@ -15,7 +15,7 @@ public class Review {
     @JoinColumn(name = "movie_id")
     private Movie movie;
 
-    private Long reviewRating;
+    private Double reviewRating;
     private String reviewAuthor;
     private String reviewText;
     private LocalDate reviewDate;
@@ -23,7 +23,7 @@ public class Review {
 
     protected Review() {}
 
-    public Review(Movie movie, Long reviewRating, String reviewAuthor, String reviewText) {
+    public Review(Movie movie, Double reviewRating, String reviewAuthor, String reviewText) {
         this.movie = movie;
         this.reviewRating = reviewRating;
         this.reviewAuthor = reviewAuthor;
@@ -40,7 +40,7 @@ public class Review {
         return movie;
     }
 
-    public Long getReviewRating() {
+    public Double getReviewRating() {
         return reviewRating;
     }
 
@@ -60,7 +60,7 @@ public class Review {
         return reviewUpdateDate;
     }
 
-    public void setReviewRating(Long reviewRating) {
+    public void setReviewRating(Double reviewRating) {
         this.reviewRating = reviewRating;
     }
 

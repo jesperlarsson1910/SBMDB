@@ -1,6 +1,7 @@
 package org.example.sbmdb.controller;
 
 import org.example.sbmdb.entity.dto.*;
+import org.example.sbmdb.error.DuplicateEntityException;
 import org.example.sbmdb.filter.MovieFilter;
 import org.example.sbmdb.filter.ReviewFilter;
 import org.example.sbmdb.service.MovieService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -55,23 +57,53 @@ public class ViewController {
             model.addAttribute("error", e.getMessage());
         }
         model.addAttribute("filter", filter);
+        model.addAttribute("pageable", pageable);
         return "movies";
     }
 
     @GetMapping("/movies/{id}")
-    public String movie(@PathVariable Long id, Model model) {
-        model.addAttribute("movie", movieService.getMovieDTO(id));
+    public String movie(@PathVariable Long id,
+                        @RequestParam(required = false, defaultValue = "reviewDate,desc") String sort,
+                        Model model) {
+        String[] sortParts = sort.split(",");
+        Sort.Direction direction = sortParts.length > 1 && sortParts[1].equals("asc")
+                ? Sort.Direction.ASC : Sort.Direction.DESC;
+        model.addAttribute("movie", movieService.getMovieDTO(id, Sort.by(direction, sortParts[0])));
         return "movie";
     }
 
     @GetMapping("/movies/create")
-    public String createMovieForm() {
+    public String createMovieForm(
+            @ModelAttribute("error") String error,
+            @ModelAttribute("formData_title") String title,
+            @ModelAttribute("formData_directors") String directors,
+            @ModelAttribute("formData_description") String description,
+            @ModelAttribute("formData_runningTime") String runningTime,
+            @ModelAttribute("formData_releaseYear") String releaseYear,
+            Model model) {
+        if (error != null && !error.isBlank()) model.addAttribute("error", error);
+        if (title != null && !title.isBlank()) {
+            model.addAttribute("movie", new MovieDTO(
+                    null,
+                    title,
+                    directors != null ? Arrays.asList(directors.split(",")) : List.of(),
+                    description,
+                    runningTime != null && !runningTime.isBlank() ? Long.parseLong(runningTime) : null,
+                    releaseYear != null && !releaseYear.isBlank() ? LocalDate.parse(releaseYear) : null,
+                    null,
+                    List.of()
+            ));
+        }
         return "movie-form";
     }
 
     @GetMapping("/movies/{id}/edit")
-    public String editMovieForm(@PathVariable Long id, Model model) {
+    public String editMovieForm(
+            @PathVariable Long id,
+            @ModelAttribute("error") String error,
+            Model model) {
         model.addAttribute("movie", movieService.getMovieDTO(id));
+        if (error != null && !error.isBlank()) model.addAttribute("error", error);
         return "movie-form";
     }
 
@@ -81,19 +113,30 @@ public class ViewController {
             @RequestParam String directors,
             @RequestParam(required = false) String description,
             @RequestParam Long runningTime,
-            @RequestParam String releaseYear) {
-        List<String> directorList = Arrays.stream(directors.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isBlank())
-                .collect(Collectors.toList());
-        movieService.create(new CreateMovieDTO(
-                title,
-                directorList,
-                description,
-                runningTime,
-                LocalDate.parse(releaseYear)
-        ));
-        return "redirect:/";
+            @RequestParam String releaseYear,
+            RedirectAttributes redirectAttributes) {
+        try {
+            List<String> directorList = Arrays.stream(directors.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isBlank())
+                    .collect(Collectors.toList());
+            movieService.create(new CreateMovieDTO(
+                    title,
+                    directorList,
+                    description,
+                    runningTime,
+                    LocalDate.parse(releaseYear)
+            ));
+            return "redirect:/";
+        } catch (DuplicateEntityException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("formData_title", title);
+            redirectAttributes.addFlashAttribute("formData_directors", directors);
+            redirectAttributes.addFlashAttribute("formData_description", description);
+            redirectAttributes.addFlashAttribute("formData_runningTime", String.valueOf(runningTime));
+            redirectAttributes.addFlashAttribute("formData_releaseYear", releaseYear);
+            return "redirect:/movies/create";
+        }
     }
 
     @PostMapping("/movies/{id}/edit")
@@ -103,20 +146,26 @@ public class ViewController {
             @RequestParam(required = false) String directors,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Long runningTime,
-            @RequestParam(required = false) String releaseYear) {
-        List<String> directorList = directors != null ? Arrays.stream(directors.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isBlank())
-                .collect(Collectors.toList()) : null;
-        movieService.update(new UpdateMovieDTO(
-                id,
-                title,
-                directorList,
-                description != null ? Optional.of(description) : null,
-                runningTime,
-                releaseYear != null ? LocalDate.parse(releaseYear) : null
-        ));
-        return "redirect:/movies/" + id;
+            @RequestParam(required = false) String releaseYear,
+            RedirectAttributes redirectAttributes) {
+        try {
+            List<String> directorList = directors != null ? Arrays.stream(directors.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isBlank())
+                    .collect(Collectors.toList()) : null;
+            movieService.update(new UpdateMovieDTO(
+                    id,
+                    title,
+                    directorList,
+                    description != null ? Optional.of(description) : null,
+                    runningTime,
+                    releaseYear != null ? LocalDate.parse(releaseYear) : null
+            ));
+            return "redirect:/movies/" + id;
+        } catch (DuplicateEntityException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/movies/" + id + "/edit";
+        }
     }
 
     @PostMapping("/movies/{id}/delete")
@@ -143,6 +192,7 @@ public class ViewController {
             model.addAttribute("error", e.getMessage());
         }
         model.addAttribute("filter", filter);
+        model.addAttribute("pageable", pageable);
         return "reviews";
     }
 
@@ -153,48 +203,68 @@ public class ViewController {
     }
 
     @GetMapping("/movies/{id}/review")
-    public String createReviewForm(@PathVariable Long id, Model model) {
+    public String createReviewForm(
+            @PathVariable Long id,
+            @ModelAttribute("error") String error,
+            Model model) {
         model.addAttribute("movieId", id);
+        if (error != null && !error.isBlank()) model.addAttribute("error", error);
         return "review-form";
     }
 
     @GetMapping("/reviews/{id}/edit")
-    public String editReviewForm(@PathVariable Long id, Model model) {
+    public String editReviewForm(
+            @PathVariable Long id,
+            @ModelAttribute("error") String error,
+            Model model) {
         ReviewDTO review = reviewService.getReviewDTO(id);
         model.addAttribute("movieId", review.movieId());
         model.addAttribute("review", review);
+        if (error != null && !error.isBlank()) model.addAttribute("error", error);
         return "review-form";
     }
 
     @PostMapping("/reviews/create")
     public String createReview(
             @RequestParam Long movieId,
-            @RequestParam Long reviewRating,
+            @RequestParam Double reviewRating,
             @RequestParam String reviewAuthor,
-            @RequestParam(required = false) String reviewText) {
-        reviewService.create(new CreateReviewDTO(
-                movieId,
-                reviewRating,
-                reviewAuthor,
-                reviewText
-        ));
-        return "redirect:/movies/" + movieId;
+            @RequestParam(required = false) String reviewText,
+            RedirectAttributes redirectAttributes) {
+        try {
+            reviewService.create(new CreateReviewDTO(
+                    movieId,
+                    reviewRating,
+                    reviewAuthor,
+                    reviewText
+            ));
+            return "redirect:/movies/" + movieId;
+        } catch (DuplicateEntityException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/movies/" + movieId + "/review";
+        }
     }
 
     @PostMapping("/reviews/{id}/edit")
     public String updateReview(
             @PathVariable Long id,
             @RequestParam Long movieId,
-            @RequestParam(required = false) Long reviewRating,
+            @RequestParam(required = false) Double reviewRating,
             @RequestParam(required = false) String reviewAuthor,
-            @RequestParam(required = false) String reviewText) {
-        reviewService.update(new UpdateReviewDTO(
-                id,
-                reviewRating,
-                reviewAuthor,
-                reviewText != null ? Optional.of(reviewText) : null
-        ));
-        return "redirect:/movies/" + movieId;
+            @RequestParam(required = false) String reviewText,
+            RedirectAttributes redirectAttributes) {
+        try {
+            reviewService.update(new UpdateReviewDTO(
+                    id,
+                    reviewRating,
+                    reviewAuthor,
+                    reviewText != null ? Optional.of(reviewText) : null
+            ));
+            return "redirect:/movies/" + movieId;
+        } catch (DuplicateEntityException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/reviews/" + id + "/edit";
+        }
     }
 
     @PostMapping("/reviews/{id}/delete")

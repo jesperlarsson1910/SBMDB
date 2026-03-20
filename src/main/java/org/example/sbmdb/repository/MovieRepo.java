@@ -8,17 +8,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.List;
 
 
 @Repository
 public interface MovieRepo extends JpaRepository<Movie, Long>, JpaSpecificationExecutor<Movie> {
 
-    @Query("SELECT COUNT(m) > 0 FROM Movie m WHERE LOWER(m.title) = LOWER(:title) AND m.releaseYear = :releaseYear")
+    @Query("SELECT COUNT(m) > 0 FROM Movie m WHERE LOWER(m.title) = LOWER(:title) AND YEAR(m.releaseYear) = YEAR(:releaseYear)")
     boolean existsByTitleIgnoreCaseAndReleaseYear(@Param("title") String title, @Param("releaseYear") LocalDate releaseYear);
 
     default boolean isUnique(Movie movie){
-        return !existsByTitleIgnoreCaseAndReleaseYear(movie.title(), movie.getReleaseYear());
+        return !existsByTitleIgnoreCaseAndReleaseYear(movie.getTitle(), movie.getReleaseYear());
     }
 
 }

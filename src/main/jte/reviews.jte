@@ -6,8 +6,16 @@
 @param Page<ReviewDTO> reviews
 @param ReviewFilter filter
 @param String error = null
+@param org.springframework.data.domain.Pageable pageable
 
 @template.layout(title = "Reviews", content = @`
+
+    !{String query = "";}
+    !{if (filter.author() != null && !filter.author().isBlank()) query += "&author=" + filter.author();}
+    !{if (filter.movieId() != null) query += "&movieId=" + filter.movieId();}
+    !{if (filter.ratingMin() != null) query += "&ratingMin=" + filter.ratingMin();}
+    !{if (filter.ratingMax() != null) query += "&ratingMax=" + filter.ratingMax();}
+    !{String sortQuery = pageable.getSort().isSorted() ? "&sort=" + pageable.getSort().toString().replace(": ", ",") : "";}
 
     <div class="page-header">
         <h1 class="page-title">Reviews</h1>
@@ -42,6 +50,12 @@
         </label>
         <button type="submit" class="btn btn-primary">Search</button>
         <a href="/reviews" class="btn btn-ghost">Clear</a>
+        <select name="sort" onchange="this.form.submit()" style="width: 150px;">
+            <option value="reviewDate,desc">Newest First</option>
+            <option value="reviewDate,asc">Oldest First</option>
+            <option value="reviewRating,desc">Highest Rated</option>
+            <option value="reviewRating,asc">Lowest Rated</option>
+        </select>
     </form>
 
     @if(reviews.isEmpty())
@@ -62,13 +76,11 @@
                                 ${review.reviewAuthor()}
                             </a>
                             <span style="font-size: 0.73rem; color: var(--text-muted); margin-left: 0.75rem;">
-                                ${String.valueOf(review.reviewDate())}
+                                ${String.valueOf(review.reviewUpdateDate())}
+                                @if(!review.reviewDate().equals(review.reviewUpdateDate()))
+                                    <span style="color: var(--text-muted);">(posted ${String.valueOf(review.reviewDate())})</span>
+                                @endif
                             </span>
-                            @if(!review.reviewDate().equals(review.reviewUpdateDate()))
-                                <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 0.5rem;">
-                                    (edited ${String.valueOf(review.reviewUpdateDate())})
-                                </span>
-                            @endif
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <div style="position: relative; display: inline-block; font-size: 0.85rem; letter-spacing: 0.1em;">
@@ -90,7 +102,10 @@
                     <div style="display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
                         <a href="/reviews/${review.id()}/edit" class="btn btn-ghost" style="font-size: 0.72rem; padding: 0.35rem 0.85rem;">Edit</a>
                         <form method="post" action="/reviews/${review.id()}/delete" style="margin: 0;">
-                            <button type="submit" class="btn btn-danger" style="font-size: 0.72rem; padding: 0.35rem 0.85rem;">Delete</button>
+                            <button type="submit" class="btn btn-danger" style="font-size: 0.72rem; padding: 0.35rem 0.85rem;"
+                                    onclick="return confirm('Are you sure you want to delete this review by ${review.reviewAuthor()}?')">
+                                Delete
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -99,19 +114,19 @@
 
         <div class="pagination">
             @if(!reviews.isFirst())
-                <a href="?page=${reviews.getNumber() - 1}&size=${reviews.getSize()}">←</a>
+                <a href="?page=${reviews.getNumber() - 1}&size=${reviews.getSize()}${query}${sortQuery}">←</a>
             @endif
 
             @for(int i = 0; i < reviews.getTotalPages(); i++)
                 @if(i == reviews.getNumber())
                     <span class="active">${i + 1}</span>
                 @else
-                    <a href="?page=${i}&size=${reviews.getSize()}">${i + 1}</a>
+                    <a href="?page=${i}&size=${reviews.getSize()}${query}${sortQuery}">${i + 1}</a>
                 @endif
             @endfor
 
             @if(!reviews.isLast())
-                <a href="?page=${reviews.getNumber() + 1}&size=${reviews.getSize()}">→</a>
+                <a href="?page=${reviews.getNumber() + 1}&size=${reviews.getSize()}${query}${sortQuery}">→</a>
             @endif
         </div>
     @endif

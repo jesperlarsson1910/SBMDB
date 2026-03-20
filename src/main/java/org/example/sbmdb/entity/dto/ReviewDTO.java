@@ -6,7 +6,7 @@ public record ReviewDTO(
         Long id,
         Long movieId,
         String movieTitle,
-        Long reviewRating,
+        Double reviewRating,
         String reviewAuthor,
         String reviewText,
         LocalDate reviewDate,

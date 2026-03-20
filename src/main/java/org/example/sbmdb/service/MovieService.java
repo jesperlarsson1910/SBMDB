@@ -1,6 +1,7 @@
 package org.example.sbmdb.service;
 
 
+import org.example.sbmdb.entity.Review;
 import org.example.sbmdb.entity.dto.CreateMovieDTO;
 import org.example.sbmdb.entity.dto.MovieDTO;
 import org.example.sbmdb.entity.dto.MovieSummaryDTO;
@@ -11,18 +12,24 @@ import org.example.sbmdb.error.*;
 import org.example.sbmdb.filter.MovieSpecification;
 import org.example.sbmdb.filter.MovieFilter;
 import org.example.sbmdb.repository.MovieRepo;
+import org.example.sbmdb.repository.ReviewRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class MovieService {
 
     private final MovieRepo movieRepo;
+    private final ReviewRepo reviewRepo;
 
-    public MovieService(MovieRepo movieRepo) {
+    public MovieService(MovieRepo movieRepo, ReviewRepo reviewRepo) {
         this.movieRepo = movieRepo;
+        this.reviewRepo = reviewRepo;
     }
 
     public void create(CreateMovieDTO dto){
@@ -42,6 +49,12 @@ public class MovieService {
 
     public MovieDTO getMovieDTO(Long id){
         return MovieMapper.createMovieDTO(getMovie(id));
+    }
+
+    public MovieDTO getMovieDTO(Long id, Sort sort) {
+        Movie movie = getMovie(id);
+        List<Review> sortedReviews = reviewRepo.findByMovieId(id, sort);
+        return MovieMapper.createMovieDTO(movie, sortedReviews);
     }
 
     @Transactional

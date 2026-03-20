@@ -3,12 +3,26 @@
 
 @param Long movieId
 @param ReviewDTO review = null
+@param String error = null
+
+@if(error != null && !error.isBlank())
+    <div style="
+        background: rgba(192, 57, 43, 0.1);
+        border: 1px solid var(--danger);
+        color: var(--danger);
+        padding: 0.75rem 1.25rem;
+        border-radius: 3px;
+        margin-bottom: 1.25rem;
+        font-size: 0.875rem;">
+        ${error}
+    </div>
+@endif
 
 !{String pageTitle = review != null ? "Edit Review" : "Add Review";}
 !{String formAction = review != null ? "/reviews/" + review.id() + "/edit" : "/reviews/create";}
 !{String submitLabel = review != null ? "Save Changes" : "Submit Review";}
 !{String authorValue = review != null && review.reviewAuthor() != null ? review.reviewAuthor() : "";}
-!{String ratingValue = review != null && review.reviewRating() != null ? String.valueOf(review.reviewRating()) : "3";}
+!{String ratingValue = review != null && review.reviewRating() != null ? String.valueOf(review.reviewRating()) : "3.0";}
 !{String reviewTextValue = review != null && review.reviewText() != null ? review.reviewText() : "";}
 
 @template.layout(title = pageTitle, content = @`
