@@ -28,17 +28,17 @@ class ReviewMapperTest {
                 148L,
                 LocalDate.of(2010, 7, 16)
         );
-        review = new Review(movie, 5L, "John", "Great movie!");
+        review = new Review(movie, 5.0, "John", "Great movie!");
     }
 
     @Test
     void createReview_mapsAllFields() {
-        CreateReviewDTO dto = new CreateReviewDTO(1L, 5L, "John", "Great movie!");
+        CreateReviewDTO dto = new CreateReviewDTO(1L, 5.0, "John", "Great movie!");
 
         Review result = ReviewMapper.createReview(movie, dto);
 
         assertEquals(movie, result.getMovie());
-        assertEquals(5L, result.getReviewRating());
+        assertEquals(5.0, result.getReviewRating());
         assertEquals("John", result.getReviewAuthor());
         assertEquals("Great movie!", result.getReviewText());
         assertEquals(LocalDate.now(), result.getReviewDate());
@@ -46,7 +46,7 @@ class ReviewMapperTest {
 
     @Test
     void createReview_setsNullText_whenNotProvided() {
-        CreateReviewDTO dto = new CreateReviewDTO(1L, 5L, "John", null);
+        CreateReviewDTO dto = new CreateReviewDTO(1L, 5.0, "John", null);
 
         Review result = ReviewMapper.createReview(movie, dto);
 
@@ -55,11 +55,11 @@ class ReviewMapperTest {
 
     @Test
     void updateReview_updatesAllFields_whenAllProvided() {
-        UpdateReviewDTO dto = new UpdateReviewDTO(1L, 4L, "Jane", Optional.of("Pretty good!"));
+        UpdateReviewDTO dto = new UpdateReviewDTO(1L, 4.0, "Jane", Optional.of("Pretty good!"));
 
         ReviewMapper.updateReview(review, dto);
 
-        assertEquals(4L, review.getReviewRating());
+        assertEquals(4.0, review.getReviewRating());
         assertEquals("Jane", review.getReviewAuthor());
         assertEquals("Pretty good!", review.getReviewText());
         assertEquals(LocalDate.now(), review.getReviewUpdateDate());
@@ -71,7 +71,7 @@ class ReviewMapperTest {
 
         ReviewMapper.updateReview(review, dto);
 
-        assertEquals(5L, review.getReviewRating());
+        assertEquals(5.0, review.getReviewRating());
         assertEquals("John", review.getReviewAuthor());
         assertEquals("Great movie!", review.getReviewText());
     }
@@ -90,7 +90,7 @@ class ReviewMapperTest {
         ReviewDTO result = ReviewMapper.createReviewDTO(review);
 
         assertEquals("John", result.reviewAuthor());
-        assertEquals(5L, result.reviewRating());
+        assertEquals(5.0, result.reviewRating());
         assertEquals("Great movie!", result.reviewText());
         assertNotNull(result.reviewDate());
     }

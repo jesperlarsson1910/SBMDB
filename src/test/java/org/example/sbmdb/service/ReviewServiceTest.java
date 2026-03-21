@@ -55,11 +55,9 @@ class ReviewServiceTest {
                 LocalDate.of(2010, 7, 16)
         );
 
-        review = new Review(movie, 5L, "John", "Great movie!");
-
-        createDTO = new CreateReviewDTO(1L, 5L, "John", "Great movie!");
-
-        updateDTO = new UpdateReviewDTO(1L, 4L, "John", Optional.of("Pretty good!"));
+        review = new Review(movie, 5.0, "John", "Great movie!");
+        createDTO = new CreateReviewDTO(1L, 5.0, "John", "Great movie!");
+        updateDTO = new UpdateReviewDTO(1L, 4.0, "John", Optional.of("Pretty good!"));
     }
 
     // --- create ---

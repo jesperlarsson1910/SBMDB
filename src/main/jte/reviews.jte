@@ -6,6 +6,7 @@
 @param Page<ReviewDTO> reviews
 @param ReviewFilter filter
 @param String error = null
+@param String currentSort = "reviewDate,desc"
 @param org.springframework.data.domain.Pageable pageable
 
 @template.layout(title = "Reviews", content = @`
@@ -51,10 +52,10 @@
         <button type="submit" class="btn btn-primary">Search</button>
         <a href="/reviews" class="btn btn-ghost">Clear</a>
         <select name="sort" onchange="this.form.submit()" style="width: 150px;">
-            <option value="reviewDate,desc">Newest First</option>
-            <option value="reviewDate,asc">Oldest First</option>
-            <option value="reviewRating,desc">Highest Rated</option>
-            <option value="reviewRating,asc">Lowest Rated</option>
+            <option value="reviewDate,desc" selected="${currentSort.equals("reviewDate,desc")}">Newest First</option>
+            <option value="reviewDate,asc" selected="${currentSort.equals("reviewDate,asc")}">Oldest First</option>
+            <option value="reviewRating,desc" selected="${currentSort.equals("reviewRating,desc")}">Highest Rated</option>
+            <option value="reviewRating,asc" selected="${currentSort.equals("reviewRating,asc")}">Lowest Rated</option>
         </select>
     </form>
 

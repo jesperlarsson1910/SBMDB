@@ -1,6 +1,9 @@
 package org.example.sbmdb.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 
 import java.time.LocalDate;
@@ -15,17 +18,27 @@ public class Movie {
     @Column(nullable = false)
     private Long id;
 
+    @NotBlank
     @Column(nullable = false)
     private String title;
 
+    @NotEmpty
     @ElementCollection
     @CollectionTable(name = "movie_directors", joinColumns = @JoinColumn(name = "movie_id"))
     @Column(name = "director")
     private List<String> directors;
 
+    @Column
     private String description;
+
+    @NotNull
+    @Column(nullable = false)
     private Long runningTime;
+
+    @NotNull
+    @Column(nullable = false)
     private LocalDate releaseYear;
+
     private Double rating;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE, orphanRemoval = true)

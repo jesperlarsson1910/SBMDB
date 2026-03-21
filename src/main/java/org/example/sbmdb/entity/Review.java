@@ -1,6 +1,10 @@
 package org.example.sbmdb.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
@@ -11,13 +15,21 @@ public class Review {
     @Column(nullable = false)
     private Long id;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "movie_id")
     private Movie movie;
 
+    @NotNull
+    @DecimalMin("0.5")
+    @DecimalMax("5.0")
     private Double reviewRating;
+
+    @NotBlank
     private String reviewAuthor;
+
     private String reviewText;
+
     private LocalDate reviewDate;
     private LocalDate reviewUpdateDate;
 

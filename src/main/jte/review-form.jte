@@ -4,19 +4,7 @@
 @param Long movieId
 @param ReviewDTO review = null
 @param String error = null
-
-@if(error != null && !error.isBlank())
-    <div style="
-        background: rgba(192, 57, 43, 0.1);
-        border: 1px solid var(--danger);
-        color: var(--danger);
-        padding: 0.75rem 1.25rem;
-        border-radius: 3px;
-        margin-bottom: 1.25rem;
-        font-size: 0.875rem;">
-        ${error}
-    </div>
-@endif
+@param java.util.List<String> errors = null
 
 !{String pageTitle = review != null ? "Edit Review" : "Add Review";}
 !{String formAction = review != null ? "/reviews/" + review.id() + "/edit" : "/reviews/create";}
@@ -26,6 +14,38 @@
 !{String reviewTextValue = review != null && review.reviewText() != null ? review.reviewText() : "";}
 
 @template.layout(title = pageTitle, content = @`
+
+    !{String errorMsg = error;}
+    !{java.util.List<String> errorList = errors;}
+
+    @if(errorMsg != null && !errorMsg.isBlank())
+        <div style="
+            background: rgba(192, 57, 43, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 0.75rem 1.25rem;
+            border-radius: 3px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;">
+            ${errorMsg}
+        </div>
+    @endif
+
+    @if(errorList != null && !errorList.isEmpty())
+        <div style="
+            background: rgba(192, 57, 43, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 0.75rem 1.25rem;
+            border-radius: 3px;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;">
+            <div style="font-weight: 500; margin-bottom: 0.5rem;">Please fix the following errors:</div>
+            @for(String e : errorList)
+                <div>• ${e}</div>
+            @endfor
+        </div>
+    @endif
 
     <div style="margin-bottom: 0.75rem;">
         <a href="/movies/${movieId}" style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">

@@ -1,20 +1,18 @@
 package org.example.sbmdb.controller;
 
+import jakarta.validation.ConstraintViolation;
 import org.example.sbmdb.entity.dto.*;
 import org.example.sbmdb.error.DuplicateEntityException;
 import org.example.sbmdb.filter.MovieFilter;
 import org.example.sbmdb.filter.ReviewFilter;
 import org.example.sbmdb.service.MovieService;
 import org.example.sbmdb.service.ReviewService;
-import org.springframework.beans.propertyeditors.CustomNumberEditor;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -22,6 +20,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -29,10 +28,12 @@ public class ViewController {
 
     private final MovieService movieService;
     private final ReviewService reviewService;
+    private final jakarta.validation.Validator validator;
 
-    public ViewController(MovieService movieService, ReviewService reviewService) {
+    public ViewController(MovieService movieService, ReviewService reviewService, jakarta.validation.Validator validator) {
         this.movieService = movieService;
         this.reviewService = reviewService;
+        this.validator = validator;
     }
 
     // --- MOVIE VIEWS ---
@@ -47,6 +48,7 @@ public class ViewController {
             @RequestParam(required = false) Integer releaseYearTo,
             @RequestParam(required = false) Double ratingMin,
             @RequestParam(required = false) Double ratingMax,
+            @RequestParam(required = false, defaultValue = "title,asc") String sort,
             @PageableDefault(size = 20, sort = "title", direction = Sort.Direction.ASC) Pageable pageable,
             Model model) {
         MovieFilter filter = new MovieFilter(title, director, description, runningTimeMin, runningTimeMax, releaseYearFrom, releaseYearTo, ratingMin, ratingMax);
@@ -57,18 +59,21 @@ public class ViewController {
             model.addAttribute("error", e.getMessage());
         }
         model.addAttribute("filter", filter);
+        model.addAttribute("currentSort", sort);
         model.addAttribute("pageable", pageable);
         return "movies";
     }
 
     @GetMapping("/movies/{id}")
-    public String movie(@PathVariable Long id,
-                        @RequestParam(required = false, defaultValue = "reviewDate,desc") String sort,
-                        Model model) {
+    public String movie(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "reviewDate,desc") String sort,
+            Model model) {
         String[] sortParts = sort.split(",");
         Sort.Direction direction = sortParts.length > 1 && sortParts[1].equals("asc")
                 ? Sort.Direction.ASC : Sort.Direction.DESC;
         model.addAttribute("movie", movieService.getMovieDTO(id, Sort.by(direction, sortParts[0])));
+        model.addAttribute("currentSort", sort);
         return "movie";
     }
 
@@ -112,30 +117,42 @@ public class ViewController {
             @RequestParam String title,
             @RequestParam String directors,
             @RequestParam(required = false) String description,
-            @RequestParam Long runningTime,
-            @RequestParam String releaseYear,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) Long runningTime,
+            @RequestParam(required = false) String releaseYear,
+            Model model) {
+        List<String> directorList = directors != null ? Arrays.stream(directors.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.toList()) : List.of();
+
+        CreateMovieDTO dto = new CreateMovieDTO(
+                title,
+                directorList,
+                description,
+                runningTime,
+                releaseYear != null && !releaseYear.isBlank() ? LocalDate.parse(releaseYear) : null
+        );
+
+        Set<ConstraintViolation<CreateMovieDTO>> violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+            model.addAttribute("errors", violations.stream()
+                    .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                    .toList());
+            model.addAttribute("movie", new MovieDTO(null, title, directorList, description,
+                    runningTime, releaseYear != null && !releaseYear.isBlank() ? LocalDate.parse(releaseYear) : null,
+                    null, List.of()));
+            return "movie-form";
+        }
+
         try {
-            List<String> directorList = Arrays.stream(directors.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isBlank())
-                    .collect(Collectors.toList());
-            movieService.create(new CreateMovieDTO(
-                    title,
-                    directorList,
-                    description,
-                    runningTime,
-                    LocalDate.parse(releaseYear)
-            ));
+            movieService.create(dto);
             return "redirect:/";
         } catch (DuplicateEntityException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            redirectAttributes.addFlashAttribute("formData_title", title);
-            redirectAttributes.addFlashAttribute("formData_directors", directors);
-            redirectAttributes.addFlashAttribute("formData_description", description);
-            redirectAttributes.addFlashAttribute("formData_runningTime", String.valueOf(runningTime));
-            redirectAttributes.addFlashAttribute("formData_releaseYear", releaseYear);
-            return "redirect:/movies/create";
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("movie", new MovieDTO(null, title, directorList, description,
+                    runningTime, releaseYear != null && !releaseYear.isBlank() ? LocalDate.parse(releaseYear) : null,
+                    null, List.of()));
+            return "movie-form";
         }
     }
 
@@ -182,6 +199,7 @@ public class ViewController {
             @RequestParam(required = false) Double ratingMin,
             @RequestParam(required = false) Double ratingMax,
             @RequestParam(required = false) String author,
+            @RequestParam(required = false, defaultValue = "reviewDate,desc") String sort,
             @PageableDefault(size = 20, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
         ReviewFilter filter = new ReviewFilter(movieId, ratingMin, ratingMax, author);
@@ -192,6 +210,7 @@ public class ViewController {
             model.addAttribute("error", e.getMessage());
         }
         model.addAttribute("filter", filter);
+        model.addAttribute("currentSort", sort);
         model.addAttribute("pageable", pageable);
         return "reviews";
     }
@@ -227,21 +246,29 @@ public class ViewController {
     @PostMapping("/reviews/create")
     public String createReview(
             @RequestParam Long movieId,
-            @RequestParam Double reviewRating,
-            @RequestParam String reviewAuthor,
+            @RequestParam(required = false) Double reviewRating,
+            @RequestParam(required = false) String reviewAuthor,
             @RequestParam(required = false) String reviewText,
-            RedirectAttributes redirectAttributes) {
+            Model model) {
+        CreateReviewDTO dto = new CreateReviewDTO(movieId, reviewRating, reviewAuthor, reviewText);
+
+        Set<ConstraintViolation<CreateReviewDTO>> violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+            model.addAttribute("errors", violations.stream()
+                    .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                    .toList());
+            model.addAttribute("movieId", movieId);
+            return "review-form";
+        }
+
         try {
-            reviewService.create(new CreateReviewDTO(
-                    movieId,
-                    reviewRating,
-                    reviewAuthor,
-                    reviewText
-            ));
+            reviewService.create(dto);
             return "redirect:/movies/" + movieId;
         } catch (DuplicateEntityException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/movies/" + movieId + "/review";
+            System.out.println("DuplicateEntityException caught: " + e.getMessage());
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("movieId", movieId);
+            return "review-form";
         }
     }
 

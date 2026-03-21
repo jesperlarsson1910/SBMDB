@@ -6,6 +6,7 @@
 @param Page<MovieSummaryDTO> movies
 @param MovieFilter filter
 @param String error = null
+@param String currentSort = "title,asc"
 @param org.springframework.data.domain.Pageable pageable
 
 @template.layout(title = "Movies", content = @`
@@ -67,14 +68,14 @@
         <button type="submit" class="btn btn-primary">Search</button>
         <a href="/" class="btn btn-ghost">Clear</a>
         <select name="sort" onchange="this.form.submit()" style="width: 150px;">
-            <option value="title,asc">Title A-Z</option>
-            <option value="title,desc">Title Z-A</option>
-            <option value="releaseYear,desc">Newest First</option>
-            <option value="releaseYear,asc">Oldest First</option>
-            <option value="rating,desc">Highest Rated</option>
-            <option value="rating,asc">Lowest Rated</option>
-            <option value="runningTime,asc">Shortest First</option>
-            <option value="runningTime,desc">Longest First</option>
+            <option value="title,asc" selected="${currentSort.equals("title,asc")}">Title A-Z</option>
+            <option value="title,desc" selected="${currentSort.equals("title,desc")}">Title Z-A</option>
+            <option value="releaseYear,desc" selected="${currentSort.equals("releaseYear,desc")}">Newest First</option>
+            <option value="releaseYear,asc" selected="${currentSort.equals("releaseYear,asc")}">Oldest First</option>
+            <option value="rating,desc" selected="${currentSort.equals("rating,desc")}">Highest Rated</option>
+            <option value="rating,asc" selected="${currentSort.equals("rating,asc")}">Lowest Rated</option>
+            <option value="runningTime,asc" selected="${currentSort.equals("runningTime,asc")}">Shortest First</option>
+            <option value="runningTime,desc" selected="${currentSort.equals("runningTime,desc")}">Longest First</option>
         </select>
     </form>
 
