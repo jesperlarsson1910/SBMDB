@@ -1,4 +1,4 @@
-package org.example.sbmdb;
+package org.example.sbmdb.utility;
 
 import jakarta.transaction.Transactional;
 import org.example.sbmdb.entity.Movie;

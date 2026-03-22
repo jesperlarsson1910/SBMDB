@@ -69,7 +69,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public Object handleGeneric(Exception e, HttpServletRequest request, Model model) {
-        e.printStackTrace();
         if (isApiRequest(request)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }

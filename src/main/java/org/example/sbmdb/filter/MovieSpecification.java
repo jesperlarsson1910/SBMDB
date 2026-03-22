@@ -1,7 +1,6 @@
 package org.example.sbmdb.filter;
 
 import org.example.sbmdb.entity.Movie;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
