@@ -51,7 +51,7 @@
         </label>
         <button type="submit" class="btn btn-primary">Search</button>
         <a href="/reviews" class="btn btn-ghost">Clear</a>
-        <select name="sort" onchange="this.form.submit()" style="width: 150px;">
+        <select name="sort" aria-label="Sort reviews" onchange="this.form.submit()" style="width: 150px;">
             <option value="reviewDate,desc" selected="${currentSort.equals("reviewDate,desc")}">Newest First</option>
             <option value="reviewDate,asc" selected="${currentSort.equals("reviewDate,asc")}">Oldest First</option>
             <option value="reviewRating,desc" selected="${currentSort.equals("reviewRating,desc")}">Highest Rated</option>

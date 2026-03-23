@@ -31,7 +31,7 @@ public class MovieController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MovieDTO> getMovie(@PathVariable Long id) {
-        return ResponseEntity.ok(movieService.getMovieDTO(id));
+        return ResponseEntity.ok(movieService.getMovieDTO(id, Sort.by(Sort.Direction.DESC, "reviewDate")));
     }
 
     @GetMapping
@@ -43,14 +43,7 @@ public class MovieController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody UpdateMovieDTO dto) {
-        movieService.update(new UpdateMovieDTO(
-                id,
-                dto.title(),
-                dto.directors(),
-                dto.description(),
-                dto.runningTime(),
-                dto.releaseYear()
-        ));
+        movieService.update(new UpdateMovieDTO(id, dto.title(), dto.directors(), dto.description(), dto.runningTime(), dto.releaseYear()));
         return ResponseEntity.noContent().build();
     }
 

@@ -7,6 +7,8 @@ import java.time.LocalDate;
 
 public class MovieSpecification {
 
+    private MovieSpecification() {}
+
     public static Specification<Movie> hasTitle(String title) {
         return (root, query, cb) -> title == null || title.isBlank() ? null
                 : cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
@@ -39,7 +41,7 @@ public class MovieSpecification {
 
     public static Specification<Movie> releaseYearTo(Integer to) {
         return (root, query, cb) -> to == null ? null
-                : cb.lessThanOrEqualTo(root.get("releaseYear"), LocalDate.of(to, 1, 1));
+                : cb.lessThanOrEqualTo(root.get("releaseYear"), LocalDate.of(to, 12, 31));
     }
 
     public static Specification<Movie> ratingMin(Double low) {

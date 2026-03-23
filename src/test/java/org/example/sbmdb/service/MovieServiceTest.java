@@ -12,6 +12,7 @@ import org.example.sbmdb.repository.MovieRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -172,7 +173,7 @@ class MovieServiceTest {
     void search_returnsPage_whenFilterProvided() {
         MovieFilter filter = new MovieFilter("Inception", null, null, null, null, null, null, null, null);
         Page<Movie> page = new PageImpl<>(List.of(movie));
-        when(movieRepo.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        when(movieRepo.findAll(ArgumentMatchers.<Specification<Movie>>any(), any(Pageable.class))).thenReturn(page);
 
         Page<MovieSummaryDTO> result = movieService.search(filter, Pageable.unpaged());
 
@@ -183,7 +184,7 @@ class MovieServiceTest {
     @Test
     void search_returnsEmptyPage_whenNoMatches() {
         MovieFilter filter = new MovieFilter("Unknown", null, null, null, null, null, null, null, null);
-        when(movieRepo.findAll(any(Specification.class), any(Pageable.class))).thenReturn(Page.empty());
+        when(movieRepo.findAll(ArgumentMatchers.<Specification<Movie>>any(), any(Pageable.class))).thenReturn(Page.empty());
 
         Page<MovieSummaryDTO> result = movieService.search(filter, Pageable.unpaged());
 

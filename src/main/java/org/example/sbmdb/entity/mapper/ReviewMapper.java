@@ -6,10 +6,9 @@ import org.example.sbmdb.entity.dto.UpdateReviewDTO;
 import org.example.sbmdb.entity.Movie;
 import org.example.sbmdb.entity.Review;
 
-import java.time.LocalDate;
-import java.util.List;
-
 public class ReviewMapper {
+
+    private ReviewMapper() {}
 
     public static Review createReview(Movie movie, CreateReviewDTO dto) {
         return new Review(
@@ -26,7 +25,6 @@ public class ReviewMapper {
         if (dto.reviewAuthor() != null && !dto.reviewAuthor().isBlank()) review.setReviewAuthor(dto.reviewAuthor());
         //noinspection OptionalAssignedToNull
         if (dto.reviewText() != null) review.setReviewText(dto.reviewText().orElse(null));
-        review.setReviewUpdateDate(LocalDate.now());
     }
 
     public static ReviewDTO createReviewDTO(Review review) {
@@ -42,9 +40,4 @@ public class ReviewMapper {
         );
     }
 
-    public static List<ReviewDTO> createReviewDTO(List<Review> reviews) {
-        return reviews.stream()
-                .map(ReviewMapper::createReviewDTO)
-                .toList();
-    }
 }

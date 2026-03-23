@@ -12,6 +12,7 @@ import org.example.sbmdb.repository.ReviewRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -159,7 +160,7 @@ class ReviewServiceTest {
     void search_returnsPage_whenFilterProvided() {
         ReviewFilter filter = new ReviewFilter(1L, null, null, null);
         Page<Review> page = new PageImpl<>(List.of(review));
-        when(reviewRepo.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        when(reviewRepo.findAll(ArgumentMatchers.<Specification<Review>>any(), any(Pageable.class))).thenReturn(page);
 
         Page<ReviewDTO> result = reviewService.search(filter, Pageable.unpaged());
 

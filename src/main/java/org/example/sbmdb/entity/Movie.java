@@ -9,13 +9,13 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 
 @Entity
 public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
     private Long id;
 
     @NotBlank
@@ -28,7 +28,6 @@ public class Movie {
     @Column(name = "director")
     private List<String> directors;
 
-    @Column
     private String description;
 
     @NotNull
@@ -83,7 +82,7 @@ public class Movie {
     }
 
     public List<Review> getReviews() {
-        return reviews;
+        return java.util.Collections.unmodifiableList(reviews);
     }
 
     public void setTitle(String title) {
@@ -107,10 +106,11 @@ public class Movie {
     }
 
     public void updateRating() {
-        this.rating = reviews.stream()
+        OptionalDouble average = reviews.stream()
+                .filter(r -> r.getReviewRating() != null)
                 .mapToDouble(Review::getReviewRating)
-                .average()
-                .orElse(0.0);
+                .average();
+        this.rating = average.isPresent() ? average.getAsDouble() : null;
     }
 
 }

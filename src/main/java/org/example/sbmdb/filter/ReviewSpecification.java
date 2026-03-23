@@ -5,6 +5,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class ReviewSpecification {
 
+    private ReviewSpecification() {}
+
     public static Specification<Review> hasMovieId(Long movieId) {
         return (root, query, cb) -> movieId == null ? null
                 : cb.equal(root.get("movie").get("id"), movieId);

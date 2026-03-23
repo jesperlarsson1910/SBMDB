@@ -10,9 +10,9 @@ import java.time.LocalDate;
 
 @Entity
 public class Review {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
     private Long id;
 
     @NotNull
@@ -30,7 +30,10 @@ public class Review {
 
     private String reviewText;
 
+    @Column(nullable = false)
     private LocalDate reviewDate;
+
+    @Column(nullable = false)
     private LocalDate reviewUpdateDate;
 
     protected Review() {}
@@ -74,22 +77,17 @@ public class Review {
 
     public void setReviewRating(Double reviewRating) {
         this.reviewRating = reviewRating;
+        this.reviewUpdateDate = LocalDate.now();
     }
 
     public void setReviewAuthor(String reviewAuthor) {
         this.reviewAuthor = reviewAuthor;
+        this.reviewUpdateDate = LocalDate.now();
     }
 
     public void setReviewText(String reviewText) {
         this.reviewText = reviewText;
-    }
-
-    public void setReviewDate(LocalDate reviewDate) {
-        this.reviewDate = reviewDate;
-    }
-
-    public void setReviewUpdateDate(LocalDate reviewUpdateDate) {
-        this.reviewUpdateDate = reviewUpdateDate;
+        this.reviewUpdateDate = LocalDate.now();
     }
 
 }

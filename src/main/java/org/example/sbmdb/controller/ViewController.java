@@ -26,6 +26,14 @@ import java.util.stream.Collectors;
 @Controller
 public class ViewController {
 
+    private static final String MOVIES_VIEW = "movies";
+    private static final String MOVIE_VIEW = "movie";
+    private static final String MOVIE_FORM_VIEW = "movie-form";
+    private static final String REVIEWS_VIEW = "reviews";
+    private static final String REVIEW_VIEW = "review";
+    private static final String REVIEW_FORM_VIEW = "review-form";
+    private static final String REDIRECT_HOME = "redirect:/";
+
     private final MovieService movieService;
     private final ReviewService reviewService;
     private final jakarta.validation.Validator validator;
@@ -36,7 +44,34 @@ public class ViewController {
         this.validator = validator;
     }
 
+    // --- HELPERS ---
+
+    private List<String> parseDirectors(String directors) {
+        if (directors == null) return null;
+        return Arrays.stream(directors.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.toList());
+    }
+
+    private LocalDate parseDate(String date) {
+        return date != null && !date.isBlank() ? LocalDate.parse(date) : null;
+    }
+
+    private MovieDTO buildMovieDTOFromParams(String title, List<String> directorList, String description, Long runningTime, String releaseYear) {
+        return new MovieDTO(null, title, directorList, description,
+                runningTime, parseDate(releaseYear), null, List.of());
+    }
+
+    private Sort parseSort(String sort) {
+        String[] sortParts = sort.split(",");
+        Sort.Direction direction = sortParts.length > 1 && sortParts[1].equals("asc")
+                ? Sort.Direction.ASC : Sort.Direction.DESC;
+        return Sort.by(direction, sortParts[0]);
+    }
+
     // --- MOVIE VIEWS ---
+
     @GetMapping("/")
     public String movies(
             @RequestParam(required = false) String title,
@@ -61,7 +96,7 @@ public class ViewController {
         model.addAttribute("filter", filter);
         model.addAttribute("currentSort", sort);
         model.addAttribute("pageable", pageable);
-        return "movies";
+        return MOVIES_VIEW;
     }
 
     @GetMapping("/movies/{id}")
@@ -69,37 +104,14 @@ public class ViewController {
             @PathVariable Long id,
             @RequestParam(required = false, defaultValue = "reviewDate,desc") String sort,
             Model model) {
-        String[] sortParts = sort.split(",");
-        Sort.Direction direction = sortParts.length > 1 && sortParts[1].equals("asc")
-                ? Sort.Direction.ASC : Sort.Direction.DESC;
-        model.addAttribute("movie", movieService.getMovieDTO(id, Sort.by(direction, sortParts[0])));
+        model.addAttribute("movie", movieService.getMovieDTO(id, parseSort(sort)));
         model.addAttribute("currentSort", sort);
-        return "movie";
+        return MOVIE_VIEW;
     }
 
     @GetMapping("/movies/create")
-    public String createMovieForm(
-            @ModelAttribute("error") String error,
-            @ModelAttribute("formData_title") String title,
-            @ModelAttribute("formData_directors") String directors,
-            @ModelAttribute("formData_description") String description,
-            @ModelAttribute("formData_runningTime") String runningTime,
-            @ModelAttribute("formData_releaseYear") String releaseYear,
-            Model model) {
-        if (error != null && !error.isBlank()) model.addAttribute("error", error);
-        if (title != null && !title.isBlank()) {
-            model.addAttribute("movie", new MovieDTO(
-                    null,
-                    title,
-                    directors != null ? Arrays.asList(directors.split(",")) : List.of(),
-                    description,
-                    runningTime != null && !runningTime.isBlank() ? Long.parseLong(runningTime) : null,
-                    releaseYear != null && !releaseYear.isBlank() ? LocalDate.parse(releaseYear) : null,
-                    null,
-                    List.of()
-            ));
-        }
-        return "movie-form";
+    public String createMovieForm() {
+        return MOVIE_FORM_VIEW;
     }
 
     @GetMapping("/movies/{id}/edit")
@@ -109,7 +121,7 @@ public class ViewController {
             Model model) {
         model.addAttribute("movie", movieService.getMovieDTO(id));
         if (error != null && !error.isBlank()) model.addAttribute("error", error);
-        return "movie-form";
+        return MOVIE_FORM_VIEW;
     }
 
     @PostMapping("/movies/create")
@@ -120,17 +132,14 @@ public class ViewController {
             @RequestParam(required = false) Long runningTime,
             @RequestParam(required = false) String releaseYear,
             Model model) {
-        List<String> directorList = directors != null ? Arrays.stream(directors.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isBlank())
-                .collect(Collectors.toList()) : List.of();
+        List<String> directorList = parseDirectors(directors);
 
         CreateMovieDTO dto = new CreateMovieDTO(
                 title,
                 directorList,
                 description,
                 runningTime,
-                releaseYear != null && !releaseYear.isBlank() ? LocalDate.parse(releaseYear) : null
+                parseDate(releaseYear)
         );
 
         Set<ConstraintViolation<CreateMovieDTO>> violations = validator.validate(dto);
@@ -138,21 +147,17 @@ public class ViewController {
             model.addAttribute("errors", violations.stream()
                     .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                     .toList());
-            model.addAttribute("movie", new MovieDTO(null, title, directorList, description,
-                    runningTime, releaseYear != null && !releaseYear.isBlank() ? LocalDate.parse(releaseYear) : null,
-                    null, List.of()));
-            return "movie-form";
+            model.addAttribute("movie", buildMovieDTOFromParams(title, directorList, description, runningTime, releaseYear));
+            return MOVIE_FORM_VIEW;
         }
 
         try {
             movieService.create(dto);
-            return "redirect:/";
+            return REDIRECT_HOME;
         } catch (DuplicateEntityException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("movie", new MovieDTO(null, title, directorList, description,
-                    runningTime, releaseYear != null && !releaseYear.isBlank() ? LocalDate.parse(releaseYear) : null,
-                    null, List.of()));
-            return "movie-form";
+            model.addAttribute("movie", buildMovieDTOFromParams(title, directorList, description, runningTime, releaseYear));
+            return MOVIE_FORM_VIEW;
         }
     }
 
@@ -166,17 +171,13 @@ public class ViewController {
             @RequestParam(required = false) String releaseYear,
             RedirectAttributes redirectAttributes) {
         try {
-            List<String> directorList = directors != null ? Arrays.stream(directors.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isBlank())
-                    .collect(Collectors.toList()) : null;
             movieService.update(new UpdateMovieDTO(
                     id,
                     title,
-                    directorList,
+                    parseDirectors(directors),
                     description != null ? Optional.of(description) : null,
                     runningTime,
-                    releaseYear != null ? LocalDate.parse(releaseYear) : null
+                    parseDate(releaseYear)
             ));
             return "redirect:/movies/" + id;
         } catch (DuplicateEntityException e) {
@@ -188,7 +189,7 @@ public class ViewController {
     @PostMapping("/movies/{id}/delete")
     public String deleteMovie(@PathVariable Long id) {
         movieService.delete(id);
-        return "redirect:/";
+        return REDIRECT_HOME;
     }
 
     // --- REVIEW VIEWS ---
@@ -212,23 +213,19 @@ public class ViewController {
         model.addAttribute("filter", filter);
         model.addAttribute("currentSort", sort);
         model.addAttribute("pageable", pageable);
-        return "reviews";
+        return REVIEWS_VIEW;
     }
 
     @GetMapping("/reviews/{id}")
     public String review(@PathVariable Long id, Model model) {
         model.addAttribute("review", reviewService.getReviewDTO(id));
-        return "review";
+        return REVIEW_VIEW;
     }
 
     @GetMapping("/movies/{id}/review")
-    public String createReviewForm(
-            @PathVariable Long id,
-            @ModelAttribute("error") String error,
-            Model model) {
+    public String createReviewForm(@PathVariable Long id, Model model) {
         model.addAttribute("movieId", id);
-        if (error != null && !error.isBlank()) model.addAttribute("error", error);
-        return "review-form";
+        return REVIEW_FORM_VIEW;
     }
 
     @GetMapping("/reviews/{id}/edit")
@@ -240,7 +237,7 @@ public class ViewController {
         model.addAttribute("movieId", review.movieId());
         model.addAttribute("review", review);
         if (error != null && !error.isBlank()) model.addAttribute("error", error);
-        return "review-form";
+        return REVIEW_FORM_VIEW;
     }
 
     @PostMapping("/reviews/create")
@@ -258,17 +255,16 @@ public class ViewController {
                     .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                     .toList());
             model.addAttribute("movieId", movieId);
-            return "review-form";
+            return REVIEW_FORM_VIEW;
         }
 
         try {
             reviewService.create(dto);
             return "redirect:/movies/" + movieId;
         } catch (DuplicateEntityException e) {
-            System.out.println("DuplicateEntityException caught: " + e.getMessage());
             model.addAttribute("error", e.getMessage());
             model.addAttribute("movieId", movieId);
-            return "review-form";
+            return REVIEW_FORM_VIEW;
         }
     }
 

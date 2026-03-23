@@ -29,8 +29,9 @@ public class ReviewService {
     @Transactional
     public void create(CreateReviewDTO dto) {
         Movie movie = movieService.getMovie(dto.movieId());
+        if (reviewRepo.existsByReviewAuthorIgnoreCaseAndMovieId(dto.reviewAuthor(), movie.getId()))
+            throw new DuplicateEntityException("Review");
         Review review = ReviewMapper.createReview(movie, dto);
-        if (!reviewRepo.isUnique(review)) throw new DuplicateEntityException("Review");
         reviewRepo.save(review);
         movieService.updateMovieRating(movie.getId());
     }
@@ -40,6 +41,7 @@ public class ReviewService {
                 .orElseThrow(() -> new EntityNotFoundException("Review", id));
     }
 
+    @Transactional
     public ReviewDTO getReviewDTO(Long id) {
         return ReviewMapper.createReviewDTO(getReview(id));
     }
@@ -63,7 +65,7 @@ public class ReviewService {
     public Page<ReviewDTO> search(ReviewFilter filter, Pageable pageable) {
         if (filter.ratingMin() != null && filter.ratingMax() != null
                 && filter.ratingMin() > filter.ratingMax()) {
-            throw new IllegalArgumentException("Min cannot be greater than Max");
+            throw new IllegalArgumentException("Rating min cannot be greater than max");
         }
         return reviewRepo.findAll(ReviewSpecification.fromFilter(filter), pageable)
                 .map(ReviewMapper::createReviewDTO);

@@ -32,6 +32,7 @@ public class MovieService {
         this.reviewRepo = reviewRepo;
     }
 
+    @Transactional
     public void create(CreateMovieDTO dto){
         Movie movie = MovieMapper.createMovie(dto);
 
@@ -47,10 +48,12 @@ public class MovieService {
                 orElseThrow(()->new EntityNotFoundException("Movie", id));
     }
 
-    public MovieDTO getMovieDTO(Long id){
+    @Transactional
+    public MovieDTO getMovieDTO(Long id) {
         return MovieMapper.createMovieDTO(getMovie(id));
     }
 
+    @Transactional
     public MovieDTO getMovieDTO(Long id, Sort sort) {
         Movie movie = getMovie(id);
         List<Review> sortedReviews = reviewRepo.findByMovieId(id, sort);
@@ -78,19 +81,14 @@ public class MovieService {
         movieRepo.save(movie);
     }
 
-    public Page<MovieSummaryDTO> getMovies(Pageable pageable) {
-        return movieRepo.findAll(pageable)
-                .map(MovieMapper::createMovieSummaryDTO);
-    }
-
     public Page<MovieSummaryDTO> search(MovieFilter filter, Pageable pageable) {
         if (filter.ratingMin() != null && filter.ratingMax() != null
                 && filter.ratingMin() > filter.ratingMax()) {
-            throw new IllegalArgumentException("Min cannot be greater than Max");
+            throw new IllegalArgumentException("Rating min cannot be greater than max");
         }
         if (filter.releaseYearFrom() != null && filter.releaseYearTo() != null
                 && filter.releaseYearFrom() > filter.releaseYearTo()) {
-            throw new IllegalArgumentException("From cannot be greater than To");
+            throw new IllegalArgumentException("Release year from cannot be greater than to");
         }
         return movieRepo.findAll(MovieSpecification.fromFilter(filter), pageable)
                 .map(MovieMapper::createMovieSummaryDTO);

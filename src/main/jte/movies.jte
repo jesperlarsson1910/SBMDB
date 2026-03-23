@@ -67,7 +67,7 @@
 
         <button type="submit" class="btn btn-primary">Search</button>
         <a href="/" class="btn btn-ghost">Clear</a>
-        <select name="sort" onchange="this.form.submit()" style="width: 150px;">
+        <select name="sort" aria-label="Sort movies" onchange="this.form.submit()" style="width: 150px;">
             <option value="title,asc" selected="${currentSort.equals("title,asc")}">Title A-Z</option>
             <option value="title,desc" selected="${currentSort.equals("title,desc")}">Title Z-A</option>
             <option value="releaseYear,desc" selected="${currentSort.equals("releaseYear,desc")}">Newest First</option>

@@ -26,7 +26,7 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     @Transactional
-    public void run(String... args) {
+    public void run(@SuppressWarnings("NullableProblems") String... args) {
         if (movieRepo.count() == 0) {
 
             Movie m1 = movieRepo.save(new Movie("Inception", List.of("Christopher Nolan"), "A mind-bending thriller", 148L, LocalDate.of(2010, 7, 16)));

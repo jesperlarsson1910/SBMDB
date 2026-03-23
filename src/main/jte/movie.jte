@@ -55,7 +55,7 @@
         <h2 style="font-family: var(--font-heading), serif; font-size: 1.5rem; font-weight: 400;">Reviews</h2>
         <div style="display: flex; gap: 0.75rem; align-items: stretch;">
             <form method="get" action="/movies/${movie.id()}" style="margin: 0;">
-                <select name="sort" onchange="this.form.submit()" style="width: 150px; height: 100%;">
+                <select name="sort" aria-label="Sort reviews" onchange="this.form.submit()" style="width: 150px; height: 100%;">
                     <option value="reviewDate,desc" selected="${currentSort.equals("reviewDate,desc")}">Newest First</option>
                     <option value="reviewDate,asc" selected="${currentSort.equals("reviewDate,asc")}">Oldest First</option>
                     <option value="reviewRating,desc" selected="${currentSort.equals("reviewRating,desc")}">Highest Rated</option>
