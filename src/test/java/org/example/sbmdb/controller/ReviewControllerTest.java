@@ -85,7 +85,8 @@ class ReviewControllerTest {
 
     @Test
     void getReview_returns404_whenNotFound() throws Exception {
-        when(reviewService.getReviewDTO(1L)).thenThrow(new EntityNotFoundException("Review", 1L));
+        doThrow(new EntityNotFoundException("Review", 1L))
+                .when(reviewService).getReviewDTO(anyLong());
 
         mockMvc.perform(get("/api/reviews/1"))
                 .andExpect(status().isNotFound());
@@ -157,7 +158,7 @@ class ReviewControllerTest {
 
     @Test
     void delete_returns404_whenNotFound() throws Exception {
-        doThrow(new EntityNotFoundException("Review", 1L)).when(reviewService).delete(1L);
+        doThrow(new EntityNotFoundException("Review", 1L)).when(reviewService).delete(anyLong());
 
         mockMvc.perform(delete("/api/reviews/1"))
                 .andExpect(status().isNotFound());

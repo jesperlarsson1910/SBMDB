@@ -11,8 +11,6 @@ import java.util.List;
 
 public class MovieMapper {
 
-    private MovieMapper() {}
-
     public static Movie createMovie(CreateMovieDTO dto) {
         return new Movie(
                 dto.title(),
@@ -37,16 +35,6 @@ public class MovieMapper {
         return createMovieDTO(movie, movie.getReviews());
     }
 
-    public static MovieSummaryDTO createMovieSummaryDTO(Movie movie) {
-        return new MovieSummaryDTO(
-                movie.getId(),
-                movie.getTitle(),
-                movie.getDirectors(),
-                movie.getReleaseYear(),
-                movie.getRating()
-        );
-    }
-
     public static MovieDTO createMovieDTO(Movie movie, List<Review> reviews) {
         return new MovieDTO(
                 movie.getId(),
@@ -57,6 +45,16 @@ public class MovieMapper {
                 movie.getReleaseYear(),
                 movie.getRating(),
                 reviews.stream().map(ReviewMapper::createReviewDTO).toList()
+        );
+    }
+
+    public static MovieSummaryDTO createMovieSummaryDTO(Movie movie) {
+        return new MovieSummaryDTO(
+                movie.getId(),
+                movie.getTitle(),
+                movie.getDirectors(),
+                movie.getReleaseYear(),
+                movie.getRating()
         );
     }
 }

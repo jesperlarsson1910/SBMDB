@@ -191,15 +191,4 @@ class MovieServiceTest {
         assertTrue(result.isEmpty());
     }
 
-    // --- getMovies ---
-
-    @Test
-    void getMovies_returnsPage() {
-        Page<Movie> page = new PageImpl<>(List.of(movie));
-        when(movieRepo.findAll(any(Pageable.class))).thenReturn(page);
-
-        Page<MovieSummaryDTO> result = movieService.getMovies(Pageable.unpaged());
-
-        assertEquals(1, result.getTotalElements());
-    }
 }

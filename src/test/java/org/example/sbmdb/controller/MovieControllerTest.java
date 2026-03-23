@@ -8,6 +8,7 @@ import org.example.sbmdb.entity.dto.MovieSummaryDTO;
 import org.example.sbmdb.entity.dto.UpdateMovieDTO;
 import org.example.sbmdb.error.DuplicateEntityException;
 import org.example.sbmdb.error.EntityNotFoundException;
+import org.example.sbmdb.error.GlobalExceptionHandler;
 import org.example.sbmdb.filter.MovieFilter;
 import org.example.sbmdb.service.MovieService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -100,7 +102,7 @@ class MovieControllerTest {
 
     @Test
     void getMovie_returnsMovie_whenExists() throws Exception {
-        when(movieService.getMovieDTO(1L)).thenReturn(movieDTO);
+        when(movieService.getMovieDTO(anyLong(), any(Sort.class))).thenReturn(movieDTO);
 
         mockMvc.perform(get("/api/movies/1"))
                 .andExpect(status().isOk())
@@ -109,7 +111,8 @@ class MovieControllerTest {
 
     @Test
     void getMovie_returns404_whenNotFound() throws Exception {
-        when(movieService.getMovieDTO(1L)).thenThrow(new EntityNotFoundException("Movie", 1L));
+        doThrow(new EntityNotFoundException("Movie", 1L))
+                .when(movieService).getMovieDTO(anyLong(), any(Sort.class));
 
         mockMvc.perform(get("/api/movies/1"))
                 .andExpect(status().isNotFound());

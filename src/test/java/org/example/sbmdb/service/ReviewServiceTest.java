@@ -66,7 +66,7 @@ class ReviewServiceTest {
     @Test
     void create_savesReview_whenUnique() {
         when(movieService.getMovie(1L)).thenReturn(movie);
-        when(reviewRepo.isUnique(any())).thenReturn(true);
+        when(reviewRepo.existsByReviewAuthorIgnoreCaseAndMovieId(any(), any())).thenReturn(false);
 
         reviewService.create(createDTO);
 
@@ -77,7 +77,7 @@ class ReviewServiceTest {
     @Test
     void create_throwsDuplicateEntityException_whenNotUnique() {
         when(movieService.getMovie(1L)).thenReturn(movie);
-        when(reviewRepo.isUnique(any())).thenReturn(false);
+        when(reviewRepo.existsByReviewAuthorIgnoreCaseAndMovieId(any(), any())).thenReturn(true);
 
         assertThrows(DuplicateEntityException.class, () -> reviewService.create(createDTO));
         verify(reviewRepo, never()).save(any());

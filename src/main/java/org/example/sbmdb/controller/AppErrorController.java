@@ -10,21 +10,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class AppErrorController implements ErrorController {
 
-    @SuppressWarnings("SameReturnValue")
+    private static final String ERROR_VIEW = "error";
+
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request, Model model) {
-        Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        Object message = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
-
-        int statusCode = status != null ? Integer.parseInt(status.toString()) : 500;
-        String errorMessage = statusCode == 404
-                ? "The page you're looking for doesn't exist."
-                : message != null && !message.toString().isBlank()
-                ? message.toString()
-                : "An unexpected error occurred.";
+        int statusCode = resolveStatus(request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE));
+        String errorMessage = resolveMessage(statusCode, request.getAttribute(RequestDispatcher.ERROR_MESSAGE));
 
         model.addAttribute("status", statusCode);
         model.addAttribute("message", errorMessage);
-        return "error";
+        return ERROR_VIEW;
+    }
+
+    private int resolveStatus(Object status) {
+        return status != null ? Integer.parseInt(status.toString()) : 500;
+    }
+
+    private String resolveMessage(int statusCode, Object message) {
+        if (statusCode == 404) return "The page you're looking for doesn't exist.";
+        if (message != null && !message.toString().isBlank()) return message.toString();
+        return "An unexpected error occurred.";
     }
 }

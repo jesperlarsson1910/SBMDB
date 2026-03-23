@@ -16,34 +16,32 @@ import java.util.List;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final String ERROR_VIEW = "error";
+
+    private String errorView(Model model, int status, String message) {
+        model.addAttribute("status", status);
+        model.addAttribute("message", message);
+        return ERROR_VIEW;
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public Object handleNotFound(EntityNotFoundException e, HttpServletRequest request, Model model) {
-        if (isApiRequest(request)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-        model.addAttribute("status", 404);
-        model.addAttribute("message", e.getMessage());
-        return "error";
+        System.out.println("URI: " + request.getRequestURI());
+        System.out.println("isApi: " + isApiRequest(request));
+        if (isApiRequest(request)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        return errorView(model, 404, e.getMessage());
     }
 
     @ExceptionHandler(DuplicateEntityException.class)
     public Object handleDuplicate(DuplicateEntityException e, HttpServletRequest request, Model model) {
-        if (isApiRequest(request)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
-        model.addAttribute("status", 409);
-        model.addAttribute("message", e.getMessage());
-        return "error";
+        if (isApiRequest(request)) return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        return errorView(model, 409, e.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public Object handleIllegalArgument(IllegalArgumentException e, HttpServletRequest request, Model model) {
-        if (isApiRequest(request)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-        model.addAttribute("status", 400);
-        model.addAttribute("message", e.getMessage());
-        return "error";
+        if (isApiRequest(request)) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return errorView(model, 400, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -59,23 +57,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Object handleNoResourceFound(NoResourceFoundException e, HttpServletRequest request, Model model) {
-        if (isApiRequest(request)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-        model.addAttribute("status", 404);
-        model.addAttribute("message", "The page you're looking for doesn't exist.");
-        return "error";
+        if (isApiRequest(request)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        return errorView(model, 404, "The page you're looking for doesn't exist.");
     }
 
     @ExceptionHandler(Exception.class)
     public Object handleGeneric(Exception e, HttpServletRequest request, Model model) {
-        if (isApiRequest(request)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
-        }
-        model.addAttribute("status", 500);
-        model.addAttribute("message", "An unexpected error occurred.");
-        return "error";
+        if (isApiRequest(request)) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+        return errorView(model, 500, "An unexpected error occurred.");
     }
+
 
     private boolean isApiRequest(HttpServletRequest request) {
         return request.getRequestURI().startsWith("/api");
